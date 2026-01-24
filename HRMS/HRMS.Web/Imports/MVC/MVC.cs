@@ -34,6 +34,14 @@ public static partial class Views
         }
     }
 
+    public static partial class Operations
+    {
+        public static partial class LeaveCalendar
+        {
+            public const string LeaveCalendarIndex = "~/Modules/Operations/LeaveCalendar/LeaveCalendarIndex.cshtml";
+        }
+    }
+
     public static partial class Shared
     {
         public const string _Layout = "~/Views/Shared/_Layout.cshtml";

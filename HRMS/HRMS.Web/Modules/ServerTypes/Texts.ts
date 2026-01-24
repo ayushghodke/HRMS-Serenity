@@ -172,6 +172,20 @@ namespace texts {
                 export const Status: string;
                 export const TotalDays: string;
             }
+            namespace LeaveBalance {
+                export function asKey(): typeof LeaveBalance;
+                export function asTry(): typeof LeaveBalance;
+                export const Allocated: string;
+                export const Balance: string;
+                export const EmployeeFullName: string;
+                export const EmployeeId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const LeaveBalanceId: string;
+                export const LeaveType: string;
+                export const Used: string;
+                export const Year: string;
+            }
             namespace Payroll {
                 export function asKey(): typeof Payroll;
                 export function asTry(): typeof Payroll;
@@ -369,6 +383,7 @@ const Texts: typeof texts = proxyTexts({}, '', {
         Operations: {
             Attendance: {},
             Leave: {},
+            LeaveBalance: {},
             Payroll: {},
             Task: {}
         },

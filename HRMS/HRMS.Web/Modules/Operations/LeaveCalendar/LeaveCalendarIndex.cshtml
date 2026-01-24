@@ -1,0 +1,161 @@
+@using Serenity
+@using Serenity.Web
+@{
+    ViewData["Title"] = "Leave Calendar";
+}
+
+<div id="leave-calendar-container">
+    <div class="calendar-header">
+        <h2><i class="fa fa-calendar"></i> Leave Calendar</h2>
+        <div class="calendar-legend">
+            <span class="legend-item casual"><span class="color-box"></span> Casual</span>
+            <span class="legend-item sick"><span class="color-box"></span> Sick</span>
+            <span class="legend-item earned"><span class="color-box"></span> Earned</span>
+            <span class="legend-item unpaid"><span class="color-box"></span> Unpaid</span>
+        </div>
+    </div>
+    <div id="leave-calendar"></div>
+</div>
+
+<style>
+    #leave-calendar-container {
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin: 15px;
+    }
+    
+    .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .calendar-header h2 {
+        margin: 0;
+        color: #333;
+    }
+    
+    .calendar-legend {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+    }
+    
+    .color-box {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+    }
+    
+    .legend-item.casual .color-box { background: #3498db; }
+    .legend-item.sick .color-box { background: #e74c3c; }
+    .legend-item.earned .color-box { background: #27ae60; }
+    .legend-item.unpaid .color-box { background: #95a5a6; }
+    
+    #leave-calendar {
+        min-height: 600px;
+    }
+    
+    .fc-event {
+        cursor: pointer;
+        padding: 2px 5px;
+    }
+    
+    .fc-event-casual { background-color: #3498db !important; border-color: #2980b9 !important; }
+    .fc-event-sick { background-color: #e74c3c !important; border-color: #c0392b !important; }
+    .fc-event-earned { background-color: #27ae60 !important; border-color: #1e8449 !important; }
+    .fc-event-unpaid { background-color: #95a5a6 !important; border-color: #7f8c8d !important; }
+    
+    .fc-event-pending {
+        opacity: 0.7;
+        border-style: dashed !important;
+    }
+</style>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('leave-calendar');
+        
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            height: 'auto',
+            eventClick: function(info) {
+                alert(
+                    'Employee: ' + info.event.extendedProps.employeeName + '\n' +
+                    'Type: ' + info.event.extendedProps.leaveTypeName + '\n' +
+                    'Status: ' + info.event.extendedProps.statusName + '\n' +
+                    'Reason: ' + info.event.extendedProps.reason
+                );
+            },
+            events: function(info, successCallback, failureCallback) {
+                Q.serviceRequest('Services/Operations/Leave/List', {
+                    Criteria: [[["StartDate"], ">=", info.startStr], "and", [["EndDate"], "<=", info.endStr]]
+                }, function(response) {
+                    var events = response.Entities.map(function(leave) {
+                        var leaveTypeClass = '';
+                        var leaveTypeName = '';
+                        switch(leave.LeaveType) {
+                            case 1: leaveTypeClass = 'casual'; leaveTypeName = 'Casual'; break;
+                            case 2: leaveTypeClass = 'sick'; leaveTypeName = 'Sick'; break;
+                            case 3: leaveTypeClass = 'earned'; leaveTypeName = 'Earned'; break;
+                            case 4: leaveTypeClass = 'unpaid'; leaveTypeName = 'Unpaid'; break;
+                        }
+                        
+                        var statusName = '';
+                        var isPending = false;
+                        switch(leave.Status) {
+                            case 0: statusName = 'Pending'; isPending = true; break;
+                            case 1: statusName = 'Approved'; break;
+                            case -1: statusName = 'Rejected'; break;
+                            case -2: statusName = 'Cancelled'; break;
+                        }
+                        
+                        // Skip rejected and cancelled leaves
+                        if (leave.Status < 0) return null;
+                        
+                        return {
+                            id: leave.LeaveId,
+                            title: leave.EmployeeFullName + ' (' + leaveTypeName + ')',
+                            start: leave.StartDate,
+                            end: leave.EndDate,
+                            className: ['fc-event-' + leaveTypeClass, isPending ? 'fc-event-pending' : ''],
+                            extendedProps: {
+                                employeeName: leave.EmployeeFullName,
+                                leaveTypeName: leaveTypeName,
+                                statusName: statusName,
+                                reason: leave.Reason || 'No reason provided'
+                            }
+                        };
+                    }).filter(function(e) { return e !== null; });
+                    
+                    successCallback(events);
+                }, {
+                    onError: function(response) {
+                        failureCallback(response);
+                    }
+                });
+            }
+        });
+        
+        calendar.render();
+    });
+</script>

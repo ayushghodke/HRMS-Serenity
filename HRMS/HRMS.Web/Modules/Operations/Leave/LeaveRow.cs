@@ -46,7 +46,7 @@ public sealed class LeaveRow : Row<LeaveRow.RowFields>, IIdRow, INameRow
     [LookupEditor(typeof(UserRow), Async = true)]
     public int? ApprovedBy { get => fields.ApprovedBy[this]; set => fields.ApprovedBy[this] = value; }
 
-    [DisplayName("Created Date"), NotNull, DefaultValue("now")]
+    [DisplayName("Created Date"), NotNull, Insertable(false), Updatable(false)]
     public DateTime? CreatedDate { get => fields.CreatedDate[this]; set => fields.CreatedDate[this] = value; }
 
     [DisplayName("Employee Name"), Origin(jEmployee, nameof(EmployeeRow.FullName))]

@@ -10,6 +10,7 @@ public static partial class ESM
     public const string InterviewsPage = "~/esm/Modules/Recruitment/Interviews/InterviewsPage.js";
     public const string JobOpeningsPage = "~/esm/Modules/Recruitment/JobOpenings/JobOpeningsPage.js";
     public const string LanguagePage = "~/esm/Modules/Administration/Language/LanguagePage.js";
+    public const string LeaveBalancePage = "~/esm/Modules/Operations/LeaveBalance/LeaveBalancePage.js";
     public const string LeavePage = "~/esm/Modules/Operations/Leave/LeavePage.js";
     public const string LoginPage = "~/esm/Modules/Membership/Account/Login/LoginPage.js";
     public const string PayrollPage = "~/esm/Modules/Operations/Payroll/PayrollPage.js";
@@ -94,6 +95,11 @@ public static partial class ESM
             public static partial class Leave
             {
                 public const string LeavePage = "~/esm/Modules/Operations/Leave/LeavePage.js";
+            }
+
+            public static partial class LeaveBalance
+            {
+                public const string LeaveBalancePage = "~/esm/Modules/Operations/LeaveBalance/LeaveBalancePage.js";
             }
 
             public static partial class Payroll

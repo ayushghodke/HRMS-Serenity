@@ -59,4 +59,50 @@ public class LeaveEndpoint : ServiceEndpoint
         return ExcelContentResult.Create(bytes, "LeaveList_" +
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }
+
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public ServiceResponse Approve(IUnitOfWork uow, [FromBody] int leaveId,
+        [FromServices] IUserAccessor userAccessor)
+    {
+        var userId = int.Parse(userAccessor.User?.GetIdentifier() ?? "0");
+        
+        var row = uow.Connection.TryFirst<MyRow>(MyRow.Fields.LeaveId == leaveId);
+        if (row == null)
+            throw new ValidationError("LeaveNotFound", "Leave request not found.");
+        
+        if (row.Status != LeaveStatus.Pending)
+            throw new ValidationError("InvalidStatus", "Only pending leaves can be approved.");
+
+        uow.Connection.UpdateById(new MyRow
+        {
+            LeaveId = leaveId,
+            Status = LeaveStatus.Approved,
+            ApprovedBy = userId
+        });
+
+        return new ServiceResponse();
+    }
+
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public ServiceResponse Reject(IUnitOfWork uow, [FromBody] int leaveId,
+        [FromServices] IUserAccessor userAccessor)
+    {
+        var userId = int.Parse(userAccessor.User?.GetIdentifier() ?? "0");
+        
+        var row = uow.Connection.TryFirst<MyRow>(MyRow.Fields.LeaveId == leaveId);
+        if (row == null)
+            throw new ValidationError("LeaveNotFound", "Leave request not found.");
+        
+        if (row.Status != LeaveStatus.Pending)
+            throw new ValidationError("InvalidStatus", "Only pending leaves can be rejected.");
+
+        uow.Connection.UpdateById(new MyRow
+        {
+            LeaveId = leaveId,
+            Status = LeaveStatus.Rejected,
+            ApprovedBy = userId
+        });
+
+        return new ServiceResponse();
+    }
 }
