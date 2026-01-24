@@ -1,0 +1,105 @@
+/* Global Styles */
+body {
+    font-family: 'Outfit', sans-serif !important;
+    background-color: #f8fafc;
+}
+
+/* Sidebar Styling */
+.s-sidebar {
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+    border-right: none !important;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+}
+
+.s-sidebar .nav-link {
+    border-radius: 8px;
+    margin: 4px 12px;
+    transition: all 0.2s ease;
+    color: #94a3b8 !important;
+}
+
+.s-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #f8fafc !important;
+}
+
+.s-sidebar .nav-link.active {
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Dashboard Cards - Glassmorphism */
+.s-dashboard-card-sm {
+    border: none !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.s-dashboard-card-sm:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.s-dashboard-card-sm .card-body {
+    padding: 1.5rem !important;
+}
+
+.s-dashboard-card-sm h3 {
+    font-size: 2.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.s-dashboard-card-sm p {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+
+/* Grid Styling */
+.grid-container {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background: white;
+    padding: 10px;
+}
+
+.slick-row {
+    transition: background 0.2s ease;
+}
+
+.slick-row:hover {
+    background: #f1f5f9 !important;
+}
+
+.slick-cell {
+    border-right-color: transparent !important;
+    border-bottom-color: #f1f5f9 !important;
+}
+
+/* Tool buttons */
+.tool-button {
+    border-radius: 6px !important;
+    margin-right: 8px !important;
+    font-weight: 500 !important;
+}
+
+.add-button {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    border: none !important;
+}
+
+.add-button:hover {
+    background-color: #2563eb !important;
+}
+
+/* Logo Styling */
+.s-site-logo-img {
+    filter: brightness(0) invert(1);
+    height: 32px;
+}

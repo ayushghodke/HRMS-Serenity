@@ -1,0 +1,8 @@
+{
+  "Extends": "defaults@9.0.0",
+  "RootNamespace": "HRMS",
+  "UpgradeInfo": {
+    "InitialType": "Community",
+    "InitialVersion": "9.1.1.1"
+  }
+}

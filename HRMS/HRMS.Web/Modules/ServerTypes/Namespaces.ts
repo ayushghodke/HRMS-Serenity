@@ -1,0 +1,10 @@
+﻿export const AdministrationNS: "HRMS.Administration" = "HRMS.Administration";
+export const nsAdministration: "HRMS.Administration." = "HRMS.Administration.";
+export const HRNS: "HRMS.HR" = "HRMS.HR";
+export const nsHR: "HRMS.HR." = "HRMS.HR.";
+export const MembershipNS: "HRMS.Membership" = "HRMS.Membership";
+export const nsMembership: "HRMS.Membership." = "HRMS.Membership.";
+export const OperationsNS: "HRMS.Operations" = "HRMS.Operations";
+export const nsOperations: "HRMS.Operations." = "HRMS.Operations.";
+export const RecruitmentNS: "HRMS.Recruitment" = "HRMS.Recruitment";
+export const nsRecruitment: "HRMS.Recruitment." = "HRMS.Recruitment.";
