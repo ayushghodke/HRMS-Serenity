@@ -13,3 +13,4 @@ export * from "./Recruitment/JobOpeningsForm";
 export * from "./Recruitment/JobOpeningsRow";
 export * from "./Recruitment/JobOpeningsService";
 export * from "./Recruitment/JobOpeningStatus";
+export * from "./Recruitment/UpdateStatusRequest";

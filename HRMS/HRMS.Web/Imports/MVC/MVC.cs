@@ -42,6 +42,14 @@ public static partial class Views
         }
     }
 
+    public static partial class Recruitment
+    {
+        public static partial class CandidateKanban
+        {
+            public const string CandidateKanbanIndex = "~/Modules/Recruitment/CandidateKanban/CandidateKanbanIndex.cshtml";
+        }
+    }
+
     public static partial class Shared
     {
         public const string _Layout = "~/Views/Shared/_Layout.cshtml";

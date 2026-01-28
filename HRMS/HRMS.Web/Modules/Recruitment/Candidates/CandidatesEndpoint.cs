@@ -54,4 +54,26 @@ public class CandidatesEndpoint : ServiceEndpoint
         return ExcelContentResult.Create(bytes, "CandidatesList_" +
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }
+
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public ServiceResponse UpdateStatus(IUnitOfWork uow, [FromBody] UpdateStatusRequest request)
+    {
+        var candidate = uow.Connection.TryFirst<MyRow>(MyRow.Fields.CandidateId == request.CandidateId);
+        if (candidate == null)
+            throw new ValidationError("CandidateNotFound", "Candidate not found.");
+
+        uow.Connection.UpdateById(new MyRow
+        {
+            CandidateId = request.CandidateId,
+            Status = request.NewStatus
+        });
+
+        return new ServiceResponse();
+    }
+}
+
+public class UpdateStatusRequest
+{
+    public int CandidateId { get; set; }
+    public CandidateStatus NewStatus { get; set; }
 }

@@ -1,0 +1,330 @@
+@using Serenity
+@using Serenity.Web
+@{
+    ViewData["Title"] = "Candidate Kanban Board";
+}
+
+<div id="kanban-container">
+    <div class="kanban-header">
+        <h2><i class="fa fa-trello"></i> Recruitment Pipeline</h2>
+        <button id="refresh-kanban" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>
+    </div>
+
+    <div class="kanban-board">
+        <div class="kanban-column" data-status="0">
+            <div class="column-header rejected">
+                <h3>❌ Rejected</h3>
+                <span class="count" id="count-0">0</span>
+            </div>
+            <div class="column-content sortable" id="column-0"></div>
+        </div>
+
+        <div class="kanban-column" data-status="1">
+            <div class="column-header applied">
+                <h3>📝 Applied</h3>
+                <span class="count" id="count-1">0</span>
+            </div>
+            <div class="column-content sortable" id="column-1"></div>
+        </div>
+
+        <div class="kanban-column" data-status="2">
+            <div class="column-header shortlisted">
+                <h3>⭐ Shortlisted</h3>
+                <span class="count" id="count-2">0</span>
+            </div>
+            <div class="column-content sortable" id="column-2"></div>
+        </div>
+
+        <div class="kanban-column" data-status="3">
+            <div class="column-header interviewed">
+                <h3>💬 Interviewed</h3>
+                <span class="count" id="count-3">0</span>
+            </div>
+            <div class="column-content sortable" id="column-3"></div>
+        </div>
+
+        <div class="kanban-column" data-status="4">
+            <div class="column-header offered">
+                <h3>🎁 Offered</h3>
+                <span class="count" id="count-4">0</span>
+            </div>
+            <div class="column-content sortable" id="column-4"></div>
+        </div>
+
+        <div class="kanban-column" data-status="5">
+            <div class="column-header hired">
+                <h3>✅ Hired</h3>
+                <span class="count" id="count-5">0</span>
+            </div>
+            <div class="column-content sortable" id="column-5"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #kanban-container {
+        padding: 20px;
+        background: #f5f5f5;
+        min-height: calc(100vh - 100px);
+    }
+
+    .kanban-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .kanban-header h2 {
+        margin: 0;
+        color: #333;
+    }
+
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 15px;
+        overflow-x: auto;
+    }
+
+    .kanban-column {
+        min-width: 280px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 180px);
+    }
+
+    .column-header {
+        padding: 15px;
+        border-radius: 8px 8px 0 0;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .column-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .column-header .count {
+        background: rgba(255,255,255,0.3);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: bold;
+    }
+
+    .column-header.rejected { background: #95a5a6; }
+    .column-header.applied { background: #3498db; }
+    .column-header.shortlisted { background: #f39c12; }
+    .column-header.interviewed { background: #9b59b6; }
+    .column-header.offered { background: #27ae60; }
+    .column-header.hired { background: #16a085; }
+
+    .column-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        min-height: 200px;
+    }
+
+    .candidate-card {
+        background: #fff;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 10px;
+        cursor: move;
+        transition: all 0.3s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .candidate-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+
+    .candidate-card.dragging {
+        opacity: 0.5;
+    }
+
+    .candidate-name {
+        font-weight: bold;
+        font-size: 15px;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .candidate-info {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .candidate-info i {
+        width: 16px;
+    }
+
+    .candidate-job {
+        background: #ecf0f1;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #34495e;
+        margin-top: 8px;
+        display: inline-block;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #bdc3c7;
+        font-style: italic;
+    }
+
+    @@media (max-width: 1600px) {
+        .kanban-board {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 1000px) {
+        .kanban-board {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .kanban-board {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@@latest/Sortable.min.js"></script>
+
+<script type="text/javascript">
+    var candidates = [];
+
+    function loadCandidates() {
+        Q.serviceRequest('Recruitment/Candidates/List', {}, function(response) {
+            candidates = response.Entities;
+            renderKanban();
+        });
+    }
+
+    function renderKanban() {
+        // Clear all columns
+        for (let i = 0; i <= 5; i++) {
+            document.getElementById('column-' + i).innerHTML = '';
+            document.getElementById('count-' + i).textContent = '0';
+        }
+
+        // Group candidates by status
+        var grouped = {};
+        candidates.forEach(function(candidate) {
+            var status = candidate.Status || 1;
+            if (!grouped[status]) grouped[status] = [];
+            grouped[status].push(candidate);
+        });
+
+        // Render cards in each column
+        Object.keys(grouped).forEach(function(status) {
+            var columnEl = document.getElementById('column-' + status);
+            var count = grouped[status].length;
+            
+            document.getElementById('count-' + status).textContent = count;
+
+            grouped[status].forEach(function(candidate) {
+                var card = createCandidateCard(candidate);
+                columnEl.appendChild(card);
+            });
+        });
+
+        // Show empty state for empty columns
+        for (let i = 0; i <= 5; i++) {
+            var columnEl = document.getElementById('column-' + i);
+            if (columnEl.children.length === 0) {
+                var emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-state';
+                emptyDiv.textContent = 'No candidates';
+                columnEl.appendChild(emptyDiv);
+            }
+        }
+    }
+
+    function createCandidateCard(candidate) {
+        var card = document.createElement('div');
+        card.className = 'candidate-card';
+        card.setAttribute('data-id', candidate.CandidateId);
+        
+        var appliedDate = new Date(candidate.AppliedDate).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        card.innerHTML = 
+            '<div class="candidate-name">' + candidate.FirstName + ' ' + candidate.LastName + '</div>' +
+            '<div class="candidate-info"><i class="fa fa-envelope"></i>' + candidate.Email + '</div>' +
+            (candidate.Mobile ? '<div class="candidate-info"><i class="fa fa-phone"></i>' + candidate.Mobile + '</div>' : '') +
+            '<div class="candidate-info"><i class="fa fa-calendar"></i>' + appliedDate + '</div>' +
+            (candidate.JobTitle ? '<div class="candidate-job"><i class="fa fa-briefcase"></i> ' + candidate.JobTitle + '</div>' : '');
+
+        return card;
+    }
+
+    function updateCandidateStatus(candidateId, newStatus) {
+        Q.serviceRequest('Recruitment/Candidates/UpdateStatus', {
+            CandidateId: parseInt(candidateId),
+            NewStatus: parseInt(newStatus)
+        }, function() {
+            Q.notifySuccess('Candidate status updated successfully!');
+            loadCandidates(); // Refresh
+        }, {
+            onError: function(response) {
+                Q.notifyError(response.Error.Message || 'Failed to update status');
+                loadCandidates(); // Revert
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCandidates();
+
+        // Initialize SortableJS for each column
+        var columns = document.querySelectorAll('.sortable');
+        columns.forEach(function(column) {
+            new Sortable(column, {
+                group: 'kanban',
+                animation: 150,
+                ghostClass: 'dragging',
+                onEnd: function(evt) {
+                    var candidateId = evt.item.getAttribute('data-id');
+                    var newStatus = evt.to.parentElement.getAttribute('data-status');
+                    
+                    if (evt.from !== evt.to) {
+                        updateCandidateStatus(candidateId, newStatus);
+                    }
+                }
+            });
+        });
+
+        // Refresh button
+        document.getElementById('refresh-kanban').addEventListener('click', function() {
+            loadCandidates();
+        });
+    });
+</script>
