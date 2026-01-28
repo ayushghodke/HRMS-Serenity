@@ -1,0 +1,98 @@
+@using Serenity
+@using Serenity.Web
+@{
+    ViewData["Title"] = "Interview Calendar";
+}
+
+@section Head {
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <style>
+        .fc-event {
+            cursor: pointer;
+        }
+        .interview-card-row {
+            margin-bottom: 5px;
+        }
+        .interview-card-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+    </style>
+}
+
+<div class="s-DataGrid">
+    <div class="grid-title">
+        <div class="title-text">Interview Schedule</div>
+    </div>
+    <div id="calendar" style="margin: 20px; background: white; padding: 15px; min-height: 600px;"></div>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: function(info, successCallback, failureCallback) {
+                Q.serviceRequest('Recruitment/Interviews/List', {}, function(response) {
+                    var events = response.Entities.map(function(item) {
+                        var color = '#3498db'; // Default Blue (Technical)
+                        switch(item.Round) {
+                            case 1: color = '#3498db'; break; // Technical
+                            case 2: color = '#9b59b6'; break; // HR
+                            case 3: color = '#e67e22'; break; // Management
+                            case 4: color = '#27ae60'; break; // Final
+                        }
+
+                        // Parse date string to ISO format if needed, but Serenity returns standard date strings
+                        // FullCalendar accepts ISO8601 strings
+                        
+                        return {
+                            id: item.InterviewId,
+                            title: (item.CandidateName || 'Unknown') + ' - ' + getRoundName(item.Round),
+                            start: item.InterviewDate,
+                            backgroundColor: color,
+                            borderColor: color,
+                            extendedProps: {
+                                candidate: item.CandidateName,
+                                interviewer: item.InterviewerName,
+                                round: getRoundName(item.Round),
+                                comments: item.Comments
+                            }
+                        };
+                    });
+                    successCallback(events);
+                });
+            },
+            eventClick: function(info) {
+                var props = info.event.extendedProps;
+                var content = 
+                    '<div class="interview-card-row"><span class="interview-card-label">Candidate:</span>' + (props.candidate || '-') + '</div>' +
+                    '<div class="interview-card-row"><span class="interview-card-label">Interviewer:</span>' + (props.interviewer || '-') + '</div>' +
+                    '<div class="interview-card-row"><span class="interview-card-label">Round:</span>' + (props.round || '-') + '</div>' +
+                    '<div class="interview-card-row"><span class="interview-card-label">Time:</span>' + (info.event.start ? info.event.start.toLocaleString() : '-') + '</div>' +
+                    (props.comments ? '<div class="interview-card-row"><span class="interview-card-label">Comments:</span>' + props.comments + '</div>' : '');
+
+                Q.alert(content, {
+                    title: 'Interview Details',
+                    htmlEncode: false
+                });
+            }
+        });
+        calendar.render();
+    });
+
+    function getRoundName(roundId) {
+        switch(roundId) {
+            case 1: return 'Technical Round';
+            case 2: return 'HR Round';
+            case 3: return 'Management Round';
+            case 4: return 'Final Round';
+            default: return 'Unknown Round';
+        }
+    }
+</script>

@@ -6,3 +6,4 @@ using MyPages = HRMS.Recruitment.Pages;
 [assembly: NavigationLink(6200, "Recruitment/Candidates", typeof(MyPages.CandidatesPage), icon: "fa-user-plus")]
 [assembly: NavigationLink(6250, "Recruitment/Candidate Kanban", typeof(MyPages.CandidateKanbanPage), icon: "fa-trello")]
 [assembly: NavigationLink(6300, "Recruitment/Interviews", typeof(MyPages.InterviewsPage), icon: "fa-comments")]
+[assembly: NavigationLink(6350, "Recruitment/Interview Calendar", typeof(MyPages.InterviewCalendarPage), icon: "fa-calendar")]

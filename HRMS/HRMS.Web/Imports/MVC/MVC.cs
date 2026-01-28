@@ -48,6 +48,11 @@ public static partial class Views
         {
             public const string CandidateKanbanIndex = "~/Modules/Recruitment/CandidateKanban/CandidateKanbanIndex.cshtml";
         }
+
+        public static partial class InterviewCalendar
+        {
+            public const string InterviewCalendarIndex = "~/Modules/Recruitment/InterviewCalendar/InterviewCalendarIndex.cshtml";
+        }
     }
 
     public static partial class Shared
