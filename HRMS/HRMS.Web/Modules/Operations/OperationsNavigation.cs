@@ -5,6 +5,8 @@ using MyPages = HRMS.Operations.Pages;
 [assembly: NavigationLink(2000, "Operations/Attendance", typeof(MyPages.AttendancePage), icon: "fa-clock-o")]
 [assembly: NavigationLink(2002, "Operations/Payroll", typeof(MyPages.PayrollPage), icon: "fa-money")]
 [assembly: NavigationLink(2003, "Operations/Tasks", typeof(MyPages.TaskPage), icon: "fa-tasks")]
+[assembly: NavigationLink(2004, "Operations/Assets", typeof(MyPages.AssetsPage), icon: "fa-cubes")]
+[assembly: NavigationLink(2005, "Operations/Asset Kanban", typeof(MyPages.AssetKanbanPage), icon: "fa-th-large")]
 
 // Leave Management Submenu
 [assembly: NavigationMenu(2100, "Operations/Leave Management", icon: "fa-calendar-check-o")]

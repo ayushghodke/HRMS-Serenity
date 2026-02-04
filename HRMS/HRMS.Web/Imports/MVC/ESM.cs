@@ -2,6 +2,7 @@
 
 public static partial class ESM
 {
+    public const string AssetsPage = "~/esm/Modules/Operations/Assets/AssetsPage.js";
     public const string AttendancePage = "~/esm/Modules/Operations/Attendance/AttendancePage.js";
     public const string CandidatesPage = "~/esm/Modules/Recruitment/Candidates/CandidatesPage.js";
     public const string DepartmentPage = "~/esm/Modules/HR/Department/DepartmentPage.js";
@@ -87,6 +88,11 @@ public static partial class ESM
 
         public static partial class Operations
         {
+            public static partial class Assets
+            {
+                public const string AssetsPage = "~/esm/Modules/Operations/Assets/AssetsPage.js";
+            }
+
             public static partial class Attendance
             {
                 public const string AttendancePage = "~/esm/Modules/Operations/Attendance/AttendancePage.js";

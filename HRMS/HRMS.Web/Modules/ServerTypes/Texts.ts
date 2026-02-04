@@ -135,6 +135,22 @@ namespace texts {
         namespace Operations {
             export function asKey(): typeof Operations;
             export function asTry(): typeof Operations;
+            namespace Assets {
+                export function asKey(): typeof Assets;
+                export function asTry(): typeof Assets;
+                export const AssetId: string;
+                export const AssetName: string;
+                export const AssetType: string;
+                export const AssignedTo: string;
+                export const AssignedToFullName: string;
+                export const Cost: string;
+                export const Description: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const PurchaseDate: string;
+                export const SerialNumber: string;
+                export const Status: string;
+            }
             namespace Attendance {
                 export function asKey(): typeof Attendance;
                 export function asTry(): typeof Attendance;
@@ -382,6 +398,7 @@ const Texts: typeof texts = proxyTexts({}, '', {
             Employee: {}
         },
         Operations: {
+            Assets: {},
             Attendance: {},
             Leave: {},
             LeaveBalance: {},

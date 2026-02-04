@@ -1,0 +1,294 @@
+@using Serenity
+@using Serenity.Web
+@{
+    ViewData["Title"] = "Asset Kanban Board";
+}
+
+<div id="kanban-container">
+    <div class="kanban-header">
+        <h2><i class="fa fa-th-large"></i> Asset Management</h2>
+        <button id="refresh-kanban" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>
+    </div>
+
+    <div class="kanban-board">
+        <div class="kanban-column" data-status="1">
+            <div class="column-header available">
+                <h3>✅ Available</h3>
+                <span class="count" id="count-1">0</span>
+            </div>
+            <div class="column-content sortable" id="column-1"></div>
+        </div>
+
+        <div class="kanban-column" data-status="2">
+            <div class="column-header in-use">
+                <h3>👤 In Use</h3>
+                <span class="count" id="count-2">0</span>
+            </div>
+            <div class="column-content sortable" id="column-2"></div>
+        </div>
+
+        <div class="kanban-column" data-status="3">
+            <div class="column-header in-repair">
+                <h3>🔧 In Repair</h3>
+                <span class="count" id="count-3">0</span>
+            </div>
+            <div class="column-content sortable" id="column-3"></div>
+        </div>
+
+        <div class="kanban-column" data-status="4">
+            <div class="column-header retired">
+                <h3>🗑️ Retired</h3>
+                <span class="count" id="count-4">0</span>
+            </div>
+            <div class="column-content sortable" id="column-4"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #kanban-container {
+        padding: 20px;
+        background: #f5f5f5;
+        min-height: calc(100vh - 100px);
+    }
+
+    .kanban-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .kanban-header h2 {
+        margin: 0;
+        color: #333;
+    }
+
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        overflow-x: auto;
+    }
+
+    .kanban-column {
+        min-width: 250px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 180px);
+    }
+
+    .column-header {
+        padding: 15px;
+        border-radius: 8px 8px 0 0;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .column-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .column-header .count {
+        background: rgba(255,255,255,0.3);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: bold;
+    }
+
+    .column-header.available { background: #27ae60; }
+    .column-header.in-use { background: #3498db; }
+    .column-header.in-repair { background: #e67e22; }
+    .column-header.retired { background: #7f8c8d; }
+
+    .column-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        min-height: 200px;
+    }
+
+    .asset-card {
+        background: #fff;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 10px;
+        cursor: move;
+        transition: all 0.3s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .asset-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+
+    .asset-card.dragging {
+        opacity: 0.5;
+    }
+
+    .asset-name {
+        font-weight: bold;
+        font-size: 15px;
+        color: #2c3e50;
+        margin-bottom: 8px;
+    }
+
+    .asset-info {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .asset-info i {
+        width: 16px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #bdc3c7;
+        font-style: italic;
+    }
+
+    @@media (max-width: 1000px) {
+        .kanban-board {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .kanban-board {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@@latest/Sortable.min.js"></script>
+
+<script type="text/javascript">
+    var assets = [];
+
+    function loadAssets() {
+        Q.serviceRequest('Operations/Assets/List', {}, function(response) {
+            assets = response.Entities;
+            renderKanban();
+        });
+    }
+
+    function renderKanban() {
+        // Clear all columns (1 to 4)
+        for (let i = 1; i <= 4; i++) {
+            var col = document.getElementById('column-' + i);
+            var cnt = document.getElementById('count-' + i);
+            if (col) col.innerHTML = '';
+            if (cnt) cnt.textContent = '0';
+        }
+
+        // Group assets by status
+        var grouped = {};
+        assets.forEach(function(asset) {
+            var status = asset.Status || 1;
+            if (!grouped[status]) grouped[status] = [];
+            grouped[status].push(asset);
+        });
+
+        // Render cards in each column
+        Object.keys(grouped).forEach(function(status) {
+            var columnEl = document.getElementById('column-' + status);
+            // Safety check in case status is out of range
+            if (!columnEl) return;
+
+            var count = grouped[status].length;
+            document.getElementById('count-' + status).textContent = count;
+
+            grouped[status].forEach(function(asset) {
+                var card = createAssetCard(asset);
+                columnEl.appendChild(card);
+            });
+        });
+
+        // Show empty state
+        for (let i = 1; i <= 4; i++) {
+            var columnEl = document.getElementById('column-' + i);
+            if (columnEl && columnEl.children.length === 0) {
+                var emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-state';
+                emptyDiv.textContent = 'No assets';
+                columnEl.appendChild(emptyDiv);
+            }
+        }
+    }
+
+    function createAssetCard(asset) {
+        var card = document.createElement('div');
+        card.className = 'asset-card';
+        card.setAttribute('data-id', asset.AssetId);
+        
+        var purchaseDate = asset.PurchaseDate ? new Date(asset.PurchaseDate).toLocaleDateString() : '-';
+
+        card.innerHTML = 
+            '<div class="asset-name">' + asset.AssetName + '</div>' +
+            (asset.SerialNumber ? '<div class="asset-info"><i class="fa fa-barcode"></i>' + asset.SerialNumber + '</div>' : '') +
+            (asset.AssignedToFullName ? '<div class="asset-info"><i class="fa fa-user"></i>' + asset.AssignedToFullName + '</div>' : '<div class="asset-info"><i class="fa fa-user-times"></i> Unassigned</div>') +
+            '<div class="asset-info"><i class="fa fa-money"></i>' + (asset.Cost || '-') + '</div>';
+
+        return card;
+    }
+
+    function updateAssetStatus(assetId, newStatus) {
+        Q.serviceRequest('Operations/Assets/UpdateStatus', {
+            AssetId: parseInt(assetId),
+            NewStatus: parseInt(newStatus)
+        }, function() {
+            Q.notifySuccess('Asset status updated successfully!');
+            loadAssets(); // Refresh
+        }, {
+            onError: function(response) {
+                Q.notifyError(response.Error.Message || 'Failed to update status');
+                loadAssets(); // Revert
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadAssets();
+
+        // Initialize SortableJS
+        var columns = document.querySelectorAll('.sortable');
+        columns.forEach(function(column) {
+            new Sortable(column, {
+                group: 'kanban',
+                animation: 150,
+                ghostClass: 'dragging',
+                onEnd: function(evt) {
+                    var assetId = evt.item.getAttribute('data-id');
+                    var newStatus = evt.to.parentElement.getAttribute('data-status');
+                    
+                    if (evt.from !== evt.to) {
+                        updateAssetStatus(assetId, newStatus);
+                    }
+                }
+            });
+        });
+
+        document.getElementById('refresh-kanban').addEventListener('click', function() {
+            loadAssets();
+        });
+    });
+</script>

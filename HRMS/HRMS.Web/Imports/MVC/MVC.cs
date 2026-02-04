@@ -36,6 +36,11 @@ public static partial class Views
 
     public static partial class Operations
     {
+        public static partial class Assets
+        {
+            public const string AssetKanbanIndex = "~/Modules/Operations/Assets/AssetKanbanIndex.cshtml";
+        }
+
         public static partial class LeaveCalendar
         {
             public const string LeaveCalendarIndex = "~/Modules/Operations/LeaveCalendar/LeaveCalendarIndex.cshtml";
