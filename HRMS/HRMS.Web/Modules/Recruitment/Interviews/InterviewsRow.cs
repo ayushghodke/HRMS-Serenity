@@ -39,10 +39,10 @@ public sealed class InterviewsRow : Row<InterviewsRow.RowFields>, IIdRow
     [DisplayName("Comments"), Size(int.MaxValue)]
     public string Comments { get => fields.Comments[this]; set => fields.Comments[this] = value; }
 
-    [DisplayName("Candidate"), Expression($"{jCandidate}.[FirstName] + ' ' + {jCandidate}.[LastName]")]
+    [DisplayName("Candidate"), Expression($"{jCandidate}.[FirstName] + ' ' + {jCandidate}.[LastName]"), MinSelectLevel(SelectLevel.List)]
     public string CandidateName { get => fields.CandidateName[this]; set => fields.CandidateName[this] = value; }
 
-    [DisplayName("Interviewer"), Expression($"{jInterviewer}.[FirstName] + ' ' + {jInterviewer}.[LastName]")]
+    [DisplayName("Interviewer"), Expression($"{jInterviewer}.[FirstName] + ' ' + {jInterviewer}.[LastName]"), MinSelectLevel(SelectLevel.List)]
     public string InterviewerName { get => fields.InterviewerName[this]; set => fields.InterviewerName[this] = value; }
 
     public class RowFields : RowFieldsBase

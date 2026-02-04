@@ -77,7 +77,7 @@
                     '<div class="interview-card-row"><span class="interview-card-label">Time:</span>' + (info.event.start ? info.event.start.toLocaleString() : '-') + '</div>' +
                     (props.comments ? '<div class="interview-card-row"><span class="interview-card-label">Comments:</span>' + props.comments + '</div>' : '');
 
-                Q.alert(content, {
+                Q.information(content, null, {
                     title: 'Interview Details',
                     htmlEncode: false
                 });
