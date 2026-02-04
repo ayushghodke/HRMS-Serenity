@@ -81,6 +81,17 @@
         opacity: 0.7;
         border-style: dashed !important;
     }
+    
+    .leave-details .detail-row {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+    
+    .leave-details .detail-row strong {
+        display: inline-block;
+        width: 100px;
+        color: #555;
+    }
 </style>
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css" rel="stylesheet" />
@@ -99,12 +110,19 @@
             },
             height: 'auto',
             eventClick: function(info) {
-                alert(
-                    'Employee: ' + info.event.extendedProps.employeeName + '\n' +
-                    'Type: ' + info.event.extendedProps.leaveTypeName + '\n' +
-                    'Status: ' + info.event.extendedProps.statusName + '\n' +
-                    'Reason: ' + info.event.extendedProps.reason
-                );
+                var props = info.event.extendedProps;
+                var content = 
+                    '<div class="leave-details">' +
+                    '<div class="detail-row"><strong>Employee:</strong> ' + props.employeeName + '</div>' +
+                    '<div class="detail-row"><strong>Type:</strong> ' + props.leaveTypeName + '</div>' +
+                    '<div class="detail-row"><strong>Status:</strong> ' + props.statusName + '</div>' +
+                    '<div class="detail-row"><strong>Reason:</strong> ' + props.reason + '</div>' +
+                    '</div>';
+                
+                Q.information(content, null, {
+                    title: 'Leave Details',
+                    htmlEncode: false
+                });
             },
             events: function(info, successCallback, failureCallback) {
                 Q.serviceRequest('Services/Operations/Leave/List', {

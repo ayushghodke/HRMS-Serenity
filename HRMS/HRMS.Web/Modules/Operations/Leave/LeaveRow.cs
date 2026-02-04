@@ -24,7 +24,7 @@ public sealed class LeaveRow : Row<LeaveRow.RowFields>, IIdRow, INameRow
     [LookupEditor(typeof(EmployeeRow), Async = true)]
     public int? EmployeeId { get => fields.EmployeeId[this]; set => fields.EmployeeId[this] = value; }
 
-    [DisplayName("Leave Type"), NotNull, DefaultValue(1)]
+    [DisplayName("Leave Type"), NotNull, DefaultValue(Operations.LeaveType.PaidLeave)]
     public LeaveType? LeaveType { get => (LeaveType?)fields.LeaveType[this]; set => fields.LeaveType[this] = (int?)value; }
 
     [DisplayName("Start Date"), NotNull]
@@ -49,6 +49,9 @@ public sealed class LeaveRow : Row<LeaveRow.RowFields>, IIdRow, INameRow
     [DisplayName("Created Date"), NotNull, Insertable(false), Updatable(false)]
     public DateTime? CreatedDate { get => fields.CreatedDate[this]; set => fields.CreatedDate[this] = value; }
 
+    [DisplayName("Approved Date")]
+    public DateTime? ApprovedDate { get => fields.ApprovedDate[this]; set => fields.ApprovedDate[this] = value; }
+
     [DisplayName("Employee Name"), Origin(jEmployee, nameof(EmployeeRow.FullName))]
     public string EmployeeFullName { get => fields.EmployeeFullName[this]; set => fields.EmployeeFullName[this] = value; }
 
@@ -67,6 +70,7 @@ public sealed class LeaveRow : Row<LeaveRow.RowFields>, IIdRow, INameRow
         public Int32Field Status;
         public Int32Field ApprovedBy;
         public DateTimeField CreatedDate;
+        public DateTimeField ApprovedDate;
 
         public StringField EmployeeFullName;
         public StringField ApprovedByUsername;
@@ -75,10 +79,11 @@ public sealed class LeaveRow : Row<LeaveRow.RowFields>, IIdRow, INameRow
 
 public enum LeaveType
 {
-    Casual = 1,
-    Sick = 2,
-    Earned = 3,
-    Unpaid = 4
+    [Description("Paid Leave")]
+    PaidLeave = 1,
+    
+    [Description("Unpaid Leave")]
+    Unpaid = 2
 }
 
 public enum LeaveStatus

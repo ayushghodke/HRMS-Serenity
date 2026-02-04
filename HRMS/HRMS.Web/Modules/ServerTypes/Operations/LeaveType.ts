@@ -1,9 +1,7 @@
 ﻿import { registerEnum } from "@serenity-is/corelib";
 
 export enum LeaveType {
-    Casual = 1,
-    Sick = 2,
-    Earned = 3,
-    Unpaid = 4
+    PaidLeave = 1,
+    Unpaid = 2
 }
 registerEnum(LeaveType, 'HRMS.Operations.LeaveType');

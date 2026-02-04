@@ -77,7 +77,8 @@ public class LeaveEndpoint : ServiceEndpoint
         {
             LeaveId = leaveId,
             Status = LeaveStatus.Approved,
-            ApprovedBy = userId
+            ApprovedBy = userId,
+            ApprovedDate = DateTime.Now
         });
 
         return new ServiceResponse();
@@ -96,11 +97,34 @@ public class LeaveEndpoint : ServiceEndpoint
         if (row.Status != LeaveStatus.Pending)
             throw new ValidationError("InvalidStatus", "Only pending leaves can be rejected.");
 
+        // Restore leave balance
+        if (row.EmployeeId.HasValue && row.LeaveType.HasValue && row.TotalDays.HasValue)
+        {
+            var currentYear = DateTime.Now.Year;
+            var fld = LeaveBalanceRow.Fields;
+            
+            var balance = uow.Connection.TryFirst<LeaveBalanceRow>(
+                fld.EmployeeId == row.EmployeeId.Value & 
+                fld.LeaveType == (int)row.LeaveType.Value & 
+                fld.Year == currentYear);
+            
+            if (balance != null)
+            {
+                var newUsed = Math.Max(0, (balance.Used ?? 0) - (decimal)row.TotalDays.Value);
+                uow.Connection.UpdateById(new LeaveBalanceRow
+                {
+                    LeaveBalanceId = balance.LeaveBalanceId,
+                    Used = newUsed
+                });
+            }
+        }
+
         uow.Connection.UpdateById(new MyRow
         {
             LeaveId = leaveId,
             Status = LeaveStatus.Rejected,
-            ApprovedBy = userId
+            ApprovedBy = userId,
+            ApprovedDate = DateTime.Now
         });
 
         return new ServiceResponse();

@@ -7,18 +7,11 @@ namespace HRMS.Operations.Columns;
 [BasedOnRow(typeof(LeaveBalanceRow), CheckNames = true)]
 public class LeaveBalanceColumns
 {
-    [EditLink, DisplayName("Db.Shared.RecordId"), AlignRight]
-    public int LeaveBalanceId { get; set; }
-    [EditLink]
+    [EditLink, Width(200)]
     public string EmployeeFullName { get; set; }
-    [Width(100), QuickFilter]
-    public LeaveType LeaveType { get; set; }
-    [Width(80)]
-    public int Year { get; set; }
-    [Width(80), AlignRight]
-    public decimal Allocated { get; set; }
-    [Width(80), AlignRight]
-    public decimal Used { get; set; }
-    [Width(80), AlignRight]
-    public decimal Balance { get; set; }
+    public DateTime EmployeeJoinDate { get; set; }
+    public int MonthsWorked { get; set; }
+    public int AccruedLeaves { get; set; }
+    public decimal LeavesThisMonth { get; set; }
+    public decimal LeavesPreviousMonths { get; set; }
 }

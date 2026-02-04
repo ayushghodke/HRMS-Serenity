@@ -176,6 +176,7 @@ namespace texts {
                 export function asTry(): typeof Leave;
                 export const ApprovedBy: string;
                 export const ApprovedByUsername: string;
+                export const ApprovedDate: string;
                 export const CreatedDate: string;
                 export const EmployeeFullName: string;
                 export const EmployeeId: string;
@@ -192,14 +193,20 @@ namespace texts {
             namespace LeaveBalance {
                 export function asKey(): typeof LeaveBalance;
                 export function asTry(): typeof LeaveBalance;
+                export const AccruedLeaves: string;
                 export const Allocated: string;
                 export const Balance: string;
                 export const EmployeeFullName: string;
                 export const EmployeeId: string;
+                export const EmployeeJoinDate: string;
                 export const EntityPlural: string;
                 export const EntitySingular: string;
                 export const LeaveBalanceId: string;
                 export const LeaveType: string;
+                export const LeavesPreviousMonths: string;
+                export const LeavesThisMonth: string;
+                export const MonthsWorked: string;
+                export const RemainingLeaves: string;
                 export const Used: string;
                 export const Year: string;
             }

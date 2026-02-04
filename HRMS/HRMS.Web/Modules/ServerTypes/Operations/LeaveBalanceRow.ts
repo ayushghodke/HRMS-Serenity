@@ -10,6 +10,12 @@ export interface LeaveBalanceRow {
     Used?: number;
     Balance?: number;
     EmployeeFullName?: string;
+    EmployeeJoinDate?: string;
+    MonthsWorked?: number;
+    AccruedLeaves?: number;
+    RemainingLeaves?: number;
+    LeavesThisMonth?: number;
+    LeavesPreviousMonths?: number;
 }
 
 export abstract class LeaveBalanceRow {

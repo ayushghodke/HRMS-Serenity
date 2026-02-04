@@ -31,14 +31,32 @@ public sealed class LeaveBalanceRow : Row<LeaveBalanceRow.RowFields>, IIdRow
     [DisplayName("Allocated"), NotNull, DefaultValue(0)]
     public decimal? Allocated { get => fields.Allocated[this]; set => fields.Allocated[this] = value; }
 
-    [DisplayName("Used"), NotNull, DefaultValue(0)]
+    [DisplayName("Used"), Expression("(SELECT SUM(ISNULL(TotalDays, 0)) FROM Leaves L WHERE L.EmployeeId = T0.EmployeeId AND L.LeaveType = T0.LeaveType AND L.Status = 1)")]
     public decimal? Used { get => fields.Used[this]; set => fields.Used[this] = value; }
 
-    [DisplayName("Balance"), Expression("(Allocated - Used)")]
+    [DisplayName("Balance"), Expression("(Allocated - ISNULL((SELECT SUM(ISNULL(TotalDays, 0)) FROM Leaves L WHERE L.EmployeeId = T0.EmployeeId AND L.LeaveType = T0.LeaveType AND L.Status = 1), 0))")]
     public decimal? Balance { get => fields.Balance[this]; set => fields.Balance[this] = value; }
 
     [DisplayName("Employee Name"), Origin(jEmployee, nameof(EmployeeRow.FullName))]
     public string EmployeeFullName { get => fields.EmployeeFullName[this]; set => fields.EmployeeFullName[this] = value; }
+
+    [DisplayName("Join Date"), Origin(jEmployee, nameof(EmployeeRow.JoiningDate))]
+    public DateTime? EmployeeJoinDate { get => fields.EmployeeJoinDate[this]; set => fields.EmployeeJoinDate[this] = value; }
+
+    [DisplayName("Months Worked"), Expression("ISNULL(DATEDIFF(MONTH, jEmployee.JoiningDate, GETDATE()) + 1, 0)")]
+    public int? MonthsWorked { get => fields.MonthsWorked[this]; set => fields.MonthsWorked[this] = value; }
+
+    [DisplayName("Accrued Leaves"), Expression("ISNULL((DATEDIFF(MONTH, jEmployee.JoiningDate, GETDATE()) + 1) * 3, 0)")]
+    public int? AccruedLeaves { get => fields.AccruedLeaves[this]; set => fields.AccruedLeaves[this] = value; }
+
+    [DisplayName("Remaining"), Expression("ISNULL(((DATEDIFF(MONTH, jEmployee.JoiningDate, GETDATE()) + 1) * 3), 0) - ISNULL((SELECT SUM(ISNULL(TotalDays, 0)) FROM Leaves L WHERE L.EmployeeId = T0.EmployeeId AND L.LeaveType = T0.LeaveType AND L.Status = 1), 0)")]
+    public decimal? RemainingLeaves { get => fields.RemainingLeaves[this]; set => fields.RemainingLeaves[this] = value; }
+
+    [DisplayName("This Month"), Expression("(SELECT SUM(ISNULL(TotalDays, 0)) FROM Leaves L WHERE L.EmployeeId = T0.EmployeeId AND L.LeaveType = T0.LeaveType AND L.Status = 1 AND MONTH(L.StartDate) = MONTH(GETDATE()) AND YEAR(L.StartDate) = YEAR(GETDATE()))")]
+    public decimal? LeavesThisMonth { get => fields.LeavesThisMonth[this]; set => fields.LeavesThisMonth[this] = value; }
+
+    [DisplayName("Previous Months"), Expression("ISNULL((SELECT SUM(ISNULL(TotalDays, 0)) FROM Leaves L WHERE L.EmployeeId = T0.EmployeeId AND L.LeaveType = T0.LeaveType AND L.Status = 1), 0) - ISNULL((SELECT SUM(ISNULL(TotalDays, 0)) FROM Leaves L WHERE L.EmployeeId = T0.EmployeeId AND L.LeaveType = T0.LeaveType AND L.Status = 1 AND MONTH(L.StartDate) = MONTH(GETDATE()) AND YEAR(L.StartDate) = YEAR(GETDATE())), 0)")]
+    public decimal? LeavesPreviousMonths { get => fields.LeavesPreviousMonths[this]; set => fields.LeavesPreviousMonths[this] = value; }
 
     public class RowFields : RowFieldsBase
     {
@@ -51,5 +69,11 @@ public sealed class LeaveBalanceRow : Row<LeaveBalanceRow.RowFields>, IIdRow
         public DecimalField Balance;
 
         public StringField EmployeeFullName;
+        public DateTimeField EmployeeJoinDate;
+        public Int32Field MonthsWorked;
+        public Int32Field AccruedLeaves;
+        public DecimalField RemainingLeaves;
+        public DecimalField LeavesThisMonth;
+        public DecimalField LeavesPreviousMonths;
     }
 }

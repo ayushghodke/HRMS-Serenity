@@ -60,6 +60,75 @@ public class LeaveBalanceEndpoint : ServiceEndpoint
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }
 
+    [HttpPost, AuthorizeCreate(typeof(MyRow))]
+    public SaveResponse RecalculateAllBalances(IUnitOfWork uow)
+    {
+        var currentYear = DateTime.Now.Year;
+        var employeeFld = HR.EmployeeRow.Fields;
+        var balanceFld = MyRow.Fields;
+        var leaveFld = Operations.LeaveRow.Fields;
+        
+        // Get all active employees
+        var employees = uow.Connection.List<HR.EmployeeRow>(
+            employeeFld.Status == (int)HR.EmployeeStatus.Active);
+        
+        int processed = 0;
+        
+        foreach (var employee in employees)
+        {
+            // Calculate total used leaves for this employee for Paid Leave type
+            // Note: We count ALL approved leaves regardless of year since accrual is cumulative from join date
+            // or we could limit to current year if "Allocated" was annual. 
+            // With monthly accrual model, it's safer to sum all usage if we assume Accrued is total since joining.
+            // However, typically "Used" field in database might be per year. 
+            // Let's assume for now we sum all approved paid leaves for this employee.
+            
+            var usedLeaves = 0m;
+            var leaves = uow.Connection.List<Operations.LeaveRow>(
+                leaveFld.EmployeeId == employee.EmployeeId.Value &
+                leaveFld.LeaveType == (int)Operations.LeaveType.PaidLeave &
+                leaveFld.Status == (int)Operations.LeaveStatus.Approved);
+                
+            foreach (var leave in leaves)
+            {
+                usedLeaves += (decimal)(leave.TotalDays ?? 0);
+            }
+
+            // Check if balance record exists
+            var existingBalance = uow.Connection.TryFirst<MyRow>(
+                balanceFld.EmployeeId == employee.EmployeeId.Value &
+                balanceFld.LeaveType == (int)Operations.LeaveType.PaidLeave &
+                balanceFld.Year == currentYear);
+            
+            if (existingBalance != null)
+            {
+                // Update existing record with correct usage
+                uow.Connection.UpdateById(new MyRow
+                {
+                    LeaveBalanceId = existingBalance.LeaveBalanceId,
+                    Used = usedLeaves
+                });
+            }
+            else
+            {
+                // Create new record with correct usage
+                uow.Connection.Insert(new MyRow
+                {
+                    EmployeeId = employee.EmployeeId.Value,
+                    LeaveType = Operations.LeaveType.PaidLeave,
+                    Year = currentYear,
+                    Allocated = 36, 
+                    Used = usedLeaves
+                });
+            }
+            
+            processed++;
+        }
+        
+        // Return success (message will be shown in UI)
+        return new SaveResponse();
+    }
+
     [HttpPost, AuthorizeList(typeof(MyRow))]
     public ListResponse<MyRow> GetEmployeeBalances(IDbConnection connection, [FromBody] int employeeId,
         [FromServices] ILeaveBalanceListHandler handler)

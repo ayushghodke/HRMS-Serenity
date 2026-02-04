@@ -13,6 +13,7 @@ export interface LeaveRow {
     Status?: LeaveStatus;
     ApprovedBy?: number;
     CreatedDate?: string;
+    ApprovedDate?: string;
     EmployeeFullName?: string;
     ApprovedByUsername?: string;
 }

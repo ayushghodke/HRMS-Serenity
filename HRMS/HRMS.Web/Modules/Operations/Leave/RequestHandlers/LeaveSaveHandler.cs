@@ -20,6 +20,41 @@ public class LeaveSaveHandler : SaveRequestHandler<MyRow, SaveRequest<MyRow>, Sa
         if (IsCreate)
         {
             Row.CreatedDate = DateTime.Now;
+            
+            // Validate leave balance
+            if (Row.EmployeeId.HasValue && Row.LeaveType.HasValue && Row.TotalDays.HasValue)
+            {
+                // Only validate for Paid Leave
+                if (Row.LeaveType.Value == LeaveType.PaidLeave)
+                {
+                    var currentYear = DateTime.Now.Year;
+                    var fld = LeaveBalanceRow.Fields;
+                    
+                    var balance = Connection.TryFirst<LeaveBalanceRow>(
+                        fld.EmployeeId == Row.EmployeeId.Value & 
+                        fld.LeaveType == (int)Row.LeaveType.Value & 
+                        fld.Year == currentYear);
+                    
+                    // Calculate accrued leaves based on months worked
+                    var employeeFld = HR.EmployeeRow.Fields;
+                    var employee = Connection.TryById<HR.EmployeeRow>(Row.EmployeeId.Value);
+                    
+                    if (employee?.JoiningDate != null)
+                    {
+                        var monthsWorked = CalculateMonthsWorked(employee.JoiningDate.Value);
+                        var accruedLeaves = monthsWorked * 3m; // 3 leaves per month
+                        var usedLeaves = balance?.Used ?? 0m;
+                        var availableBalance = accruedLeaves - usedLeaves;
+                        
+                        if (availableBalance < (decimal)Row.TotalDays.Value)
+                        {
+                            throw new ValidationError("InsufficientBalance", 
+                                $"Insufficient leave balance. You have {availableBalance} paid leaves available (accrued: {accruedLeaves}, used: {usedLeaves}).");
+                        }
+                    }
+                }
+                // Unpaid leave - no validation needed
+            }
         }
     }
 
@@ -58,14 +93,8 @@ public class LeaveSaveHandler : SaveRequestHandler<MyRow, SaveRequest<MyRow>, Sa
         else
         {
             // Create new balance record if doesn't exist
-            var defaultAllocated = leaveType switch
-            {
-                LeaveType.Casual => 12m,
-                LeaveType.Sick => 10m,
-                LeaveType.Earned => 15m,
-                LeaveType.Unpaid => 0m,
-                _ => 0m
-            };
+            // For Paid Leave: 3 leaves/month × 12 months = 36 leaves/year
+            var defaultAllocated = leaveType == LeaveType.PaidLeave ? 36m : 0m;
 
             Connection.Insert(new LeaveBalanceRow
             {
@@ -77,5 +106,16 @@ public class LeaveSaveHandler : SaveRequestHandler<MyRow, SaveRequest<MyRow>, Sa
             });
         }
     }
+    
+    private int CalculateMonthsWorked(DateTime joinDate)
+    {
+        var today = DateTime.Now;
+        var months = ((today.Year - joinDate.Year) * 12) + today.Month - joinDate.Month;
+        
+        // Add 1 if the employee joined before the current day of the month
+        if (today.Day >= joinDate.Day)
+            months++;
+            
+        return Math.Max(0, months);
+    }
 }
-
