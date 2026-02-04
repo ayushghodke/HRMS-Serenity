@@ -13,3 +13,5 @@ export * from "./HR/EmployeeService";
 export * from "./HR/EmployeeStatus";
 export * from "./HR/EmploymentType";
 export * from "./HR/Gender";
+export * from "./HR/UpcomingCelebrationsRequest";
+export * from "./HR/UpcomingCelebrationsResponse";

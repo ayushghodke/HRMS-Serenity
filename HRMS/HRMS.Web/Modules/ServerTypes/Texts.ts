@@ -128,6 +128,7 @@ namespace texts {
                 export const Phone: string;
                 export const Status: string;
                 export const UserId: string;
+                export const UserImage: string;
                 export const Username: string;
             }
         }

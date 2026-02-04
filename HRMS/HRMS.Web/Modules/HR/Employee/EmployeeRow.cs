@@ -73,6 +73,9 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
     [DisplayName("Username"), Origin(jUser, nameof(UserRow.Username))]
     public string Username { get => fields.Username[this]; set => fields.Username[this] = value; }
 
+    [DisplayName("User Image"), Origin(jUser, nameof(UserRow.UserImage))]
+    public string UserImage { get => fields.UserImage[this]; set => fields.UserImage[this] = value; }
+
     [DisplayName("Department"), Origin(jDepartment, nameof(DepartmentRow.DepartmentName))]
     public string DepartmentName { get => fields.DepartmentName[this]; set => fields.DepartmentName[this] = value; }
 
@@ -102,6 +105,7 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
         public Int32Field Status;
 
         public StringField Username;
+        public StringField UserImage;
         public StringField DepartmentName;
         public StringField DesignationName;
         public StringField ManagerFullName;

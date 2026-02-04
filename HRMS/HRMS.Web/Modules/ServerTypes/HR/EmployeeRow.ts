@@ -21,6 +21,7 @@ export interface EmployeeRow {
     EmploymentType?: EmploymentType;
     Status?: EmployeeStatus;
     Username?: string;
+    UserImage?: string;
     DepartmentName?: string;
     DesignationName?: string;
     ManagerFullName?: string;
