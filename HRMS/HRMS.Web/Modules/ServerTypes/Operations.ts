@@ -30,3 +30,4 @@ export * from "./Operations/TaskForm";
 export * from "./Operations/TaskRow";
 export * from "./Operations/TaskService";
 export * from "./Operations/TaskStatus";
+export * from "./Operations/TaskUpdateStatusRequest";

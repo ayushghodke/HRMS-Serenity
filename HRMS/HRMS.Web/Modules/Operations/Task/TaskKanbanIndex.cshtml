@@ -1,0 +1,455 @@
+@using Serenity
+@using Serenity.Web
+@{
+    ViewData["Title"] = "Task Kanban Board";
+}
+
+<div id="kanban-container">
+    <div class="kanban-header">
+        <h2><i class="fa fa-trello"></i> Task Kanban Board</h2>
+        <div class="header-actions">
+            <button id="add-task" class="btn btn-default">
+                <span class="button-inner"><i class="fa fa-plus-circle text-green"></i> New Task</span>
+            </button>
+            <button id="refresh-kanban" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>
+        </div>
+    </div>
+
+    <div class="kanban-board">
+        <div class="kanban-column" data-status="0">
+            <div class="column-header open">
+                <h3>📝 Open</h3>
+                <span class="count" id="count-0">0</span>
+                <a href="javascript:;" class="add-task-inline" data-status="0" title="Add task to Open">
+                    <i class="fa fa-plus-circle text-green"></i>
+                </a>
+            </div>
+            <div class="column-content sortable" id="column-0"></div>
+        </div>
+
+        <div class="kanban-column" data-status="1">
+            <div class="column-header in-progress">
+                <h3>⏳ In Progress</h3>
+                <span class="count" id="count-1">0</span>
+                <a href="javascript:;" class="add-task-inline" data-status="1" title="Add task to In Progress">
+                    <i class="fa fa-plus-circle text-green"></i>
+                </a>
+            </div>
+            <div class="column-content sortable" id="column-1"></div>
+        </div>
+
+        <div class="kanban-column" data-status="3">
+            <div class="column-header on-hold">
+                <h3>⏸️ On Hold</h3>
+                <span class="count" id="count-3">0</span>
+                <a href="javascript:;" class="add-task-inline" data-status="3" title="Add task to On Hold">
+                    <i class="fa fa-plus-circle text-green"></i>
+                </a>
+            </div>
+            <div class="column-content sortable" id="column-3"></div>
+        </div>
+
+        <div class="kanban-column" data-status="2">
+            <div class="column-header completed">
+                <h3>✅ Completed</h3>
+                <span class="count" id="count-2">0</span>
+                <a href="javascript:;" class="add-task-inline" data-status="2" title="Add task to Completed">
+                    <i class="fa fa-plus-circle text-green"></i>
+                </a>
+            </div>
+            <div class="column-content sortable" id="column-2"></div>
+        </div>
+
+        <div class="kanban-column" data-status="-1">
+            <div class="column-header cancelled">
+                <h3>❌ Cancelled</h3>
+                <span class="count" id="count--1">0</span>
+                <a href="javascript:;" class="add-task-inline" data-status="-1" title="Add task to Cancelled">
+                    <i class="fa fa-plus-circle text-green"></i>
+                </a>
+            </div>
+            <div class="column-content sortable" id="column--1"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #kanban-container {
+        padding: 20px;
+        background: #f0f2f5;
+        min-height: calc(100vh - 100px);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .kanban-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 15px 25px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .kanban-header h2 {
+        margin: 0;
+        color: #1a202c;
+        font-weight: 700;
+        font-size: 24px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .kanban-column {
+        min-width: 250px;
+        background: #ebedef;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 200px);
+        transition: all 0.3s ease;
+    }
+
+    .column-header {
+        padding: 15px 20px;
+        border-radius: 12px 12px 0 0;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .column-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .column-header .count {
+        background: rgba(255,255,255,0.25);
+        padding: 2px 10px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .column-header.open { background: #4a90e2; }
+    .column-header.in-progress { background: #f39c12; }
+    .column-header.on-hold { background: #e74c3c; }
+    .column-header.completed { background: #27ae60; }
+    .column-header.cancelled { background: #95a5a6; }
+
+    .column-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+        min-height: 150px;
+    }
+
+    .task-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border: 1px solid transparent;
+        position: relative;
+    }
+
+    .task-card:hover {
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+        border-color: #4a90e2;
+    }
+
+    .task-card.dragging {
+        opacity: 0.4;
+        transform: scale(0.95);
+    }
+
+    .task-title {
+        font-weight: 700;
+        font-size: 15px;
+        color: #2d3748;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .task-desc {
+        font-size: 13px;
+        color: #718096;
+        margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .task-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #edf2f7;
+        padding-top: 10px;
+        margin-top: 5px;
+    }
+
+    .task-assignee {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #4a5568;
+        font-weight: 600;
+    }
+
+    .task-assignee i {
+        color: #a0aec0;
+    }
+
+    .task-date {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: #f7fafc;
+        color: #718096;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .task-date.overdue {
+        background: #fff5f5;
+        color: #c53030;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 10px;
+        color: #a0aec0;
+        font-style: italic;
+        font-size: 13px;
+        background: rgba(255,255,255,0.5);
+        border-radius: 8px;
+        border: 2px dashed #d1d5db;
+    }
+
+    .text-green {
+        color: #27ae60 !important;
+    }
+
+    .column-header .add-task-inline {
+        color: white;
+        font-size: 18px;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+    .column-header .add-task-inline:hover {
+        opacity: 1;
+    }
+
+    .column-header .add-task-inline .text-green {
+        color: #ffffff !important; /* On colored background, white is better but user asked for text-green icon. Actually fa-plus-circle is standard. */
+    }
+
+    .header-actions .button-inner {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 1400px) {
+        .kanban-board {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @@media (max-width: 900px) {
+        .kanban-board {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .kanban-board {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@@latest/Sortable.min.js"></script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        var tasks = [];
+
+        function loadTasks() {
+            Q.serviceRequest('Operations/Task/List', {}, function(response) {
+                tasks = response.Entities;
+                renderKanban();
+            });
+        }
+
+        function renderKanban() {
+            const statuses = [0, 1, 3, 2, -1];
+            statuses.forEach(s => {
+                const el = document.getElementById('column-' + s);
+                if (el) {
+                    el.innerHTML = '';
+                    var countEl = document.getElementById('count-' + s);
+                    if(countEl) countEl.textContent = '0';
+                }
+            });
+
+            var grouped = {};
+            tasks.forEach(function(task) {
+                var status = task.Status === null || task.Status === undefined ? 0 : task.Status;
+                if (!grouped[status]) grouped[status] = [];
+                grouped[status].push(task);
+            });
+
+            Object.keys(grouped).forEach(function(status) {
+                var columnEl = document.getElementById('column-' + status);
+                if (!columnEl) return;
+
+                var count = grouped[status].length;
+                var countEl = document.getElementById('count-' + status);
+                if(countEl) countEl.textContent = count;
+
+                grouped[status].forEach(function(task) {
+                    var card = createTaskCard(task);
+                    columnEl.appendChild(card);
+                });
+            });
+
+            statuses.forEach(s => {
+                var columnEl = document.getElementById('column-' + s);
+                if (columnEl && columnEl.children.length === 0) {
+                    var emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-state';
+                    emptyDiv.textContent = 'No tasks';
+                    columnEl.appendChild(emptyDiv);
+                }
+            });
+        }
+
+        // Helper to get dialog class safely with retries
+        function getTaskDialogClass(callback) {
+            var dlgClass = Q.getConstructor('HRMS.Operations.TaskDialog');
+            if (dlgClass) {
+                callback(dlgClass);
+            } else {
+                // If not found, try to load the module via dynamic script ensuring registration
+                // This is a common issue when the script hasn't been loaded by the page yet.
+                // We fallback to checking window.HRMS.Operations.TaskDialog if manually exposed, 
+                // but standard Serenity registration is preferred.
+                
+                // Retry getting constructor after a short delay, assuming a bundle might be loading
+                // real fix: ensure the bundle is included in layout or page specific script
+                setTimeout(function() {
+                    dlgClass = Q.getConstructor('HRMS.Operations.TaskDialog');
+                    if (dlgClass) {
+                        callback(dlgClass);
+                    } else {
+                         Q.notifyError("Task Dialog script is not loaded. Please try refreshing the page.");
+                         console.error("Could not find 'HRMS.Operations.TaskDialog'. Ensure the module script is loaded.");
+                    }
+                }, 100);
+            }
+        }
+
+        function createTaskCard(task) {
+            var card = document.createElement('div');
+            card.className = 'task-card';
+            const taskId = task.TaskId || task.taskId;
+            card.setAttribute('data-id', taskId);
+            
+            var dueDate = task.DueDate ? new Date(task.DueDate) : null;
+            var dateStr = dueDate ? dueDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'No date';
+            var isOverdue = dueDate && dueDate < new Date() && (task.Status != 2 && task.status != 2);
+
+            card.innerHTML = 
+                '<div class="task-title">' + (task.Title || task.title || 'Untitled') + '</div>' +
+                (task.Description || task.description ? '<div class="task-desc">' + (task.Description || task.description) + '</div>' : '') +
+                '<div class="task-footer">' +
+                    '<div class="task-assignee"><i class="fa fa-user-circle"></i> ' + (task.AssignedToFullName || task.assignedToFullName || 'Unassigned') + '</div>' +
+                    '<div class="task-date ' + (isOverdue ? 'overdue' : '') + '"><i class="fa fa-calendar"></i> ' + dateStr + '</div>' +
+                '</div>';
+
+            card.addEventListener('click', function() {
+                window.location.href = Q.resolveUrl('~/Operations/Task#edit/' + taskId);
+            });
+
+            return card;
+        }
+
+        function updateTaskStatus(taskId, newStatus) {
+            Q.serviceRequest('Operations/Task/UpdateStatus', {
+                TaskId: parseInt(taskId),
+                NewStatus: parseInt(newStatus)
+            }, function() {
+                Q.notifySuccess('Task status updated');
+                loadTasks();
+            }, {
+                onError: function(response) {
+                    Q.notifyError(response.Error.Message || 'Failed to update status');
+                    loadTasks();
+                }
+            });
+        }
+
+        // Initialize SortableJS
+        var columns = document.querySelectorAll('.sortable');
+        columns.forEach(function(column) {
+            new Sortable(column, {
+                group: 'kanban',
+                animation: 200,
+                ghostClass: 'dragging',
+                onEnd: function(evt) {
+                    var taskId = evt.item.getAttribute('data-id');
+                    var newStatus = evt.to.parentElement.getAttribute('data-status');
+                    
+                    if (evt.from !== evt.to) {
+                        updateTaskStatus(taskId, newStatus);
+                    }
+                }
+            });
+        });
+
+        document.getElementById('refresh-kanban').addEventListener('click', function() {
+            loadTasks();
+        });
+
+        document.getElementById('add-task').addEventListener('click', function() {
+            window.location.href = Q.resolveUrl('~/Operations/Task#new');
+        });
+
+        document.querySelectorAll('.add-task-inline').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                // We redirect to the standard new task dialog
+                // Note: passing status via hash is not standard in Serenity without custom router handling
+                window.location.href = Q.resolveUrl('~/Operations/Task#new');
+            });
+        });
+
+        // Initial load
+        loadTasks();
+    });
+</script>

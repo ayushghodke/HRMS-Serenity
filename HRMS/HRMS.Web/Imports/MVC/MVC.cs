@@ -45,6 +45,11 @@ public static partial class Views
         {
             public const string LeaveCalendarIndex = "~/Modules/Operations/LeaveCalendar/LeaveCalendarIndex.cshtml";
         }
+
+        public static partial class Task
+        {
+            public const string TaskKanbanIndex = "~/Modules/Operations/Task/TaskKanbanIndex.cshtml";
+        }
     }
 
     public static partial class Recruitment

@@ -61,4 +61,24 @@ public class TaskEndpoint : ServiceEndpoint
         return ExcelContentResult.Create(bytes, "TaskList_" +
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public SaveResponse UpdateStatus(IUnitOfWork uow, TaskUpdateStatusRequest request)
+    {
+        if (request == null) throw new ArgumentNullException(nameof(request));
+        if (request.TaskId == null) throw new ArgumentNullException(nameof(request.TaskId));
+
+        var row = new MyRow
+        {
+            TaskId = request.TaskId,
+            Status = request.NewStatus
+        };
+
+        return new TaskSaveHandler(Context).Update(uow, new SaveRequest<MyRow> { Entity = row, EntityId = request.TaskId });
+    }
+}
+
+public class TaskUpdateStatusRequest : ServiceRequest
+{
+    public int? TaskId { get; set; }
+    public HRMS.Operations.TaskStatus NewStatus { get; set; }
 }

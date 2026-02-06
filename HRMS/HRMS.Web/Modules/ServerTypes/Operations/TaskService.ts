@@ -1,5 +1,6 @@
 ﻿import { DeleteRequest, DeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, serviceRequest } from "@serenity-is/corelib";
 import { TaskRow } from "./TaskRow";
+import { TaskUpdateStatusRequest } from "./TaskUpdateStatusRequest";
 
 export namespace TaskService {
     export const baseUrl = 'Operations/Task';
@@ -9,13 +10,15 @@ export namespace TaskService {
     export declare function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
     export declare function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<TaskRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<TaskRow>>;
     export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<TaskRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<TaskRow>>;
+    export declare function UpdateStatus(request: TaskUpdateStatusRequest, onSuccess?: (response: SaveResponse) => void, opt?: ServiceOptions<any>): PromiseLike<SaveResponse>;
 
     export const Methods = {
         Create: "Operations/Task/Create",
         Update: "Operations/Task/Update",
         Delete: "Operations/Task/Delete",
         Retrieve: "Operations/Task/Retrieve",
-        List: "Operations/Task/List"
+        List: "Operations/Task/List",
+        UpdateStatus: "Operations/Task/UpdateStatus"
     } as const;
 
     [
@@ -23,7 +26,8 @@ export namespace TaskService {
         'Update',
         'Delete',
         'Retrieve',
-        'List'
+        'List',
+        'UpdateStatus'
     ].forEach(x => {
         (<any>TaskService)[x] = function (r, s, o) {
             return serviceRequest(baseUrl + '/' + x, r, s, o);
