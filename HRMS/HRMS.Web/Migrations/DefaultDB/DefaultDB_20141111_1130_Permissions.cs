@@ -11,12 +11,12 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
             .WithColumn("UserPermissionId").AsInt64().IdentityKey(this)
             .WithColumn("UserId").AsInt32().NotNullable()
                 .ForeignKey("FK_UserPermissions_UserId", "Users", "UserId")
-            .WithColumn("PermissionKey").AsString(100).NotNullable()
+            .WithColumn("PermissionKey").AsString(100).NotNullable() 
             .WithColumn("Granted").AsBoolean().NotNullable().WithDefaultValue(true);
 
         Create.Index("UQ_UserPerm_UserId_PermKey")
             .OnTable("UserPermissions")
-            .OnColumn("UserId").Ascending()
+            .OnColumn("UserId").Ascending() 
             .OnColumn("PermissionKey").Ascending()
             .WithOptions().Unique();
 
@@ -45,7 +45,7 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
 
         Create.Index("UQ_UserRoles_UserId_RoleId")
             .OnTable("UserRoles")
-            .OnColumn("UserId").Ascending()
+            .OnColumn("UserId").Ascending() 
             .OnColumn("RoleId").Ascending()
             .WithOptions().Unique();
 

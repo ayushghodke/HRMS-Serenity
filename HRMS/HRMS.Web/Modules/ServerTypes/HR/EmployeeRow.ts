@@ -1,4 +1,5 @@
 ﻿import { fieldsProxy, getLookup, getLookupAsync } from "@serenity-is/corelib";
+import { EmployeeDocsRow } from "./EmployeeDocsRow";
 import { EmployeeStatus } from "./EmployeeStatus";
 import { EmploymentType } from "./EmploymentType";
 import { Gender } from "./Gender";
@@ -25,6 +26,7 @@ export interface EmployeeRow {
     DepartmentName?: string;
     DesignationName?: string;
     ManagerFullName?: string;
+    DocumentList?: EmployeeDocsRow[];
 }
 
 export abstract class EmployeeRow {

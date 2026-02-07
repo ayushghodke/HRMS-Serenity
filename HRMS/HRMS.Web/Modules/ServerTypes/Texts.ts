@@ -112,6 +112,7 @@ namespace texts {
                 export const DepartmentName: string;
                 export const DesignationId: string;
                 export const DesignationName: string;
+                export const DocumentList: string;
                 export const Email: string;
                 export const EmployeeCode: string;
                 export const EmployeeId: string;
@@ -130,6 +131,20 @@ namespace texts {
                 export const UserId: string;
                 export const UserImage: string;
                 export const Username: string;
+            }
+            namespace EmployeeDocs {
+                export function asKey(): typeof EmployeeDocs;
+                export function asTry(): typeof EmployeeDocs;
+                export const Description: string;
+                export const DocumentId: string;
+                export const DocumentType: string;
+                export const EmployeeFirstName: string;
+                export const EmployeeId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const FilePath: string;
+                export const Title: string;
+                export const UploadedOn: string;
             }
         }
         namespace Operations {
@@ -402,7 +417,8 @@ const Texts: typeof texts = proxyTexts({}, '', {
         HR: {
             Department: {},
             Designation: {},
-            Employee: {}
+            Employee: {},
+            EmployeeDocs: {}
         },
         Operations: {
             Assets: {},

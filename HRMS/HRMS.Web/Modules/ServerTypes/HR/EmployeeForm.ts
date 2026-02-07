@@ -1,4 +1,5 @@
 ﻿import { DateEditor, EnumEditor, initFormType, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
+import { EmployeeDocsEditor } from "../../HR/EmployeeDocs/EmployeeDocsEditor";
 import { EmployeeStatus } from "./EmployeeStatus";
 import { EmploymentType } from "./EmploymentType";
 import { Gender } from "./Gender";
@@ -18,6 +19,7 @@ export interface EmployeeForm {
     EmploymentType: EnumEditor;
     Status: EnumEditor;
     UserId: LookupEditor;
+    DocumentList: EmployeeDocsEditor;
 }
 
 export class EmployeeForm extends PrefixedContext {
@@ -34,6 +36,7 @@ export class EmployeeForm extends PrefixedContext {
             var w1 = EnumEditor;
             var w2 = DateEditor;
             var w3 = LookupEditor;
+            var w4 = EmployeeDocsEditor;
 
             initFormType(EmployeeForm, [
                 'FirstName', w0,
@@ -49,7 +52,8 @@ export class EmployeeForm extends PrefixedContext {
                 'ManagerId', w3,
                 'EmploymentType', w1,
                 'Status', w1,
-                'UserId', w3
+                'UserId', w3,
+                'DocumentList', w4
             ]);
         }
     }

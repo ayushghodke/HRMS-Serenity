@@ -85,6 +85,9 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
     [DisplayName("Manager"), Origin(jManager, nameof(EmployeeRow.FullName))]
     public string ManagerFullName { get => fields.ManagerFullName[this]; set => fields.ManagerFullName[this] = value; }
 
+    [DisplayName("Documents"), MasterDetailRelation(foreignKey: "EmployeeId", IncludeColumns = "Title,Description,DocumentType,FilePath,UploadedOn")]
+    public List<EmployeeDocsRow> DocumentList { get => fields.DocumentList[this]; set => fields.DocumentList[this] = value; }
+
     public class RowFields : RowFieldsBase
     {
         public Int32Field EmployeeId;
@@ -109,6 +112,8 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
         public StringField DepartmentName;
         public StringField DesignationName;
         public StringField ManagerFullName;
+
+        public RowListField<EmployeeDocsRow> DocumentList;
     }
 }
 

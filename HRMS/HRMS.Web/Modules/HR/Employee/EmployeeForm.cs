@@ -25,4 +25,8 @@ public class EmployeeForm
 
     [Tab("User")]
     public int UserId { get; set; }
+
+    [Tab("Documents")]
+    [EditorType("HRMS.HR.EmployeeDocsEditor")]
+    public List<EmployeeDocsRow> DocumentList { get; set; }
 }
