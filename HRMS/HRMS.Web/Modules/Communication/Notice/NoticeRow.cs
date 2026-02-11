@@ -9,7 +9,7 @@ namespace HRMS.Communication;
 [DisplayName("Notice"), InstanceName("Notice")]
 [ReadPermission("*")]
 [ModifyPermission("HumanResources")]
-public sealed class NoticeRow : Row<NoticeRow.RowFields>, IIdRow, INameRow
+public sealed class NoticeRow : Row<NoticeRow.RowFields>, IIdRow, INameRow, ILoggingRow
 {
     [DisplayName("Notice Id"), Identity, IdProperty]
     public int? NoticeId { get => fields.NoticeId[this]; set => fields.NoticeId[this] = value; }
@@ -32,6 +32,23 @@ public sealed class NoticeRow : Row<NoticeRow.RowFields>, IIdRow, INameRow
     [DisplayName("Is Active"), NotNull, DefaultValue(true)]
     public bool? IsActive { get => fields.IsActive[this]; set => fields.IsActive[this] = value; }
 
+    [NotNull, Insertable(false), Updatable(false)]
+    public int? InsertUserId { get => fields.InsertUserId[this]; set => fields.InsertUserId[this] = value; }
+
+    [NotNull, Insertable(false), Updatable(false)]
+    public DateTime? InsertDate { get => fields.InsertDate[this]; set => fields.InsertDate[this] = value; }
+
+    [Insertable(false), Updatable(false)]
+    public int? UpdateUserId { get => fields.UpdateUserId[this]; set => fields.UpdateUserId[this] = value; }
+
+    [Insertable(false), Updatable(false)]
+    public DateTime? UpdateDate { get => fields.UpdateDate[this]; set => fields.UpdateDate[this] = value; }
+
+    Field IInsertUserIdRow.InsertUserIdField => fields.InsertUserId;
+    DateTimeField IInsertDateRow.InsertDateField => fields.InsertDate;
+    Field IUpdateUserIdRow.UpdateUserIdField => fields.UpdateUserId;
+    DateTimeField IUpdateDateRow.UpdateDateField => fields.UpdateDate;
+
     public class RowFields : RowFieldsBase
     {
         public Int32Field NoticeId;
@@ -41,6 +58,10 @@ public sealed class NoticeRow : Row<NoticeRow.RowFields>, IIdRow, INameRow
         public DateTimeField PublishDate;
         public DateTimeField ExpiryDate;
         public BooleanField IsActive;
+        public Int32Field InsertUserId;
+        public DateTimeField InsertDate;
+        public Int32Field UpdateUserId;
+        public DateTimeField UpdateDate;
     }
 }
 

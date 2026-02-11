@@ -9,6 +9,10 @@ export interface NoticeRow {
     PublishDate?: string;
     ExpiryDate?: string;
     IsActive?: boolean;
+    InsertUserId?: number;
+    InsertDate?: string;
+    UpdateUserId?: number;
+    UpdateDate?: string;
 }
 
 export abstract class NoticeRow {

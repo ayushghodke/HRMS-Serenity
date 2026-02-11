@@ -18,7 +18,7 @@ public class DefaultDB_20141111_1130_Permissions : AutoReversingMigration
             .OnTable("UserPermissions")
             .OnColumn("UserId").Ascending() 
             .OnColumn("PermissionKey").Ascending()
-            .WithOptions().Unique(); 
+            .WithOptions().Unique();
 
         Create.Table("Roles")
             .WithColumn("RoleId").AsInt32().IdentityKey(this)

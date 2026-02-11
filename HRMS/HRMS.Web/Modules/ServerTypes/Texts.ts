@@ -91,11 +91,15 @@ namespace texts {
                 export const EntityPlural: string;
                 export const EntitySingular: string;
                 export const ExpiryDate: string;
+                export const InsertDate: string;
+                export const InsertUserId: string;
                 export const IsActive: string;
                 export const NoticeId: string;
                 export const Priority: string;
                 export const PublishDate: string;
                 export const Title: string;
+                export const UpdateDate: string;
+                export const UpdateUserId: string;
             }
         }
         namespace HR {
