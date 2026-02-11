@@ -146,6 +146,35 @@ namespace texts {
                 export const Title: string;
                 export const UploadedOn: string;
             }
+            namespace EmployeeSalary {
+                export function asKey(): typeof EmployeeSalary;
+                export function asTry(): typeof EmployeeSalary;
+                export const BasicSalary: string;
+                export const DetailList: string;
+                export const EffectiveDate: string;
+                export const EmployeeId: string;
+                export const EmployeeName: string;
+                export const EmployeeSalaryId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const GradeId: string;
+                export const GradeName: string;
+                export const GrossSalary: string;
+                export const IsActive: string;
+            }
+            namespace EmployeeSalaryDetails {
+                export function asKey(): typeof EmployeeSalaryDetails;
+                export function asTry(): typeof EmployeeSalaryDetails;
+                export const Amount: string;
+                export const ComponentId: string;
+                export const ComponentName: string;
+                export const ComponentType: string;
+                export const DetailId: string;
+                export const EmployeeSalaryId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const IsActive: string;
+            }
         }
         namespace Operations {
             export function asKey(): typeof Operations;
@@ -448,7 +477,9 @@ const Texts: typeof texts = proxyTexts({}, '', {
             Department: {},
             Designation: {},
             Employee: {},
-            EmployeeDocs: {}
+            EmployeeDocs: {},
+            EmployeeSalary: {},
+            EmployeeSalaryDetails: {}
         },
         Operations: {
             Assets: {},

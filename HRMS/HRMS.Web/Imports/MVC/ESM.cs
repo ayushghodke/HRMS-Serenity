@@ -8,6 +8,7 @@ public static partial class ESM
     public const string DepartmentPage = "~/esm/Modules/HR/Department/DepartmentPage.js";
     public const string DesignationPage = "~/esm/Modules/HR/Designation/DesignationPage.js";
     public const string EmployeePage = "~/esm/Modules/HR/Employee/EmployeePage.js";
+    public const string EmployeeSalaryPage = "~/esm/Modules/HR/EmployeeSalary/EmployeeSalaryPage.js";
     public const string InterviewsPage = "~/esm/Modules/Recruitment/Interviews/InterviewsPage.js";
     public const string JobOpeningsPage = "~/esm/Modules/Recruitment/JobOpenings/JobOpeningsPage.js";
     public const string LanguagePage = "~/esm/Modules/Administration/Language/LanguagePage.js";
@@ -69,6 +70,11 @@ public static partial class ESM
             public static partial class Employee
             {
                 public const string EmployeePage = "~/esm/Modules/HR/Employee/EmployeePage.js";
+            }
+
+            public static partial class EmployeeSalary
+            {
+                public const string EmployeeSalaryPage = "~/esm/Modules/HR/EmployeeSalary/EmployeeSalaryPage.js";
             }
         }
 
