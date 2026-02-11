@@ -1,5 +1,7 @@
 import { Decorators, EntityDialog } from '@serenity-is/corelib';
 import { EmployeeSalaryForm, EmployeeSalaryRow, EmployeeSalaryService } from '../../ServerTypes/HR';
+import { EmployeeSalaryDetailsEditor } from './EmployeeSalaryDetailsEditor';
+import { SalaryComponentType } from '../../ServerTypes/Operations';
 
 @Decorators.registerClass('HRMS.HR.EmployeeSalaryDialog')
 export class EmployeeSalaryDialog extends EntityDialog<EmployeeSalaryRow, any> {
@@ -13,11 +15,20 @@ export class EmployeeSalaryDialog extends EntityDialog<EmployeeSalaryRow, any> {
         super();
 
         this.form.BasicSalary.change(e => this.calculateGross());
+        (this.form.DetailList as EmployeeSalaryDetailsEditor).change(e => this.calculateGross());
     }
 
     protected calculateGross() {
-        // Simple calculation for now: Basic + sum of earnings (where type is Earning)
-        // This requires access to the details list and component types
-        // For now, just a placeholder or basic sum if we have details
+        var basic = this.form.BasicSalary.value || 0;
+        var details = (this.form.DetailList as EmployeeSalaryDetailsEditor).value || [];
+
+        var earnings = 0;
+        for (var item of details) {
+            if (item.ComponentType == SalaryComponentType.Earning) {
+                earnings += (item.Amount || 0);
+            }
+        }
+
+        this.form.GrossSalary.value = basic + earnings;
     }
 }

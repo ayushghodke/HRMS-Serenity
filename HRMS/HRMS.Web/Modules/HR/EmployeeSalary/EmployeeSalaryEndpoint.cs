@@ -43,4 +43,31 @@ public class EmployeeSalaryEndpoint : ServiceEndpoint
     {
         return handler.List(connection, request);
     }
+
+    [HttpPost]
+    public MyRow GetSalaryStructure(IDbConnection connection, SalaryStructureRequest request)
+    {
+        if (request == null || request.EmployeeId == null)
+            throw new ArgumentNullException(nameof(request));
+
+        var salary = connection.TryFirst<MyRow>(MyRow.Fields.EmployeeId == request.EmployeeId.Value && 
+                                                MyRow.Fields.IsActive == 1);
+        
+        if (salary == null)
+            return null;
+
+        var details = HR.EmployeeSalaryDetailsRow.Fields;
+        var detailList = connection.List<HR.EmployeeSalaryDetailsRow>(q => q
+            .SelectTableFields()
+            .Select(details.ComponentType)
+            .Where(details.EmployeeSalaryId == salary.EmployeeSalaryId.Value && details.IsActive == 1));
+
+        salary.DetailList = detailList;
+        return salary;
+    }
+}
+
+public class SalaryStructureRequest : ServiceRequest
+{
+    public int? EmployeeId { get; set; }
 }

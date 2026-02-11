@@ -1,6 +1,5 @@
-import { initFullHeightGridPage } from '@serenity-is/corelib';
+import { gridPageInit } from '@serenity-is/corelib';
 import { EmployeeSalaryGrid } from './EmployeeSalaryGrid';
+import './EmployeeSalaryDetailsEditor';
 
-export default function pageInit() {
-    initFullHeightGridPage(new EmployeeSalaryGrid($('#GridDiv')).element);
-}
+export default () => gridPageInit(EmployeeSalaryGrid);

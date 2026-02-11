@@ -1,73 +1,61 @@
-import { Decorators, EntityGrid, GridRowSelectionMixin } from '@serenity-is/corelib';
+import { Decorators, EntityGrid } from '@serenity-is/corelib';
+import { GridEditorDialog } from './GridEditorDialog';
 
 @Decorators.registerClass('HRMS.Common.GridEditorBase')
 export class GridEditorBase<TEntity> extends EntityGrid<TEntity, any> {
-    protected getID(item: TEntity) {
+    protected getId(item: TEntity) {
         if ((item as any).__id)
             return (item as any).__id;
-        return super.getID(item);
+        return (item as any)[this.getIdProperty()];
     }
 
-    protected getDisplayName() { return ""; }
-    protected getLocalTextPrefix() { return ""; }
-    protected getService() { return ""; }
+    protected getIdProperty() {
+        return this.getRowDefinition().idProperty;
+    }
 
-    constructor(container: JQuery) {
+    protected override getDisplayName() { return ""; }
+    protected override getLocalTextPrefix() { return ""; }
+    protected override getService() { return ""; }
+
+    constructor(container: any) {
         super(container);
     }
 
-    protected onViewSubmit() {
-        return false;
-    }
-
-    protected getButtons() {
-        var buttons = super.getButtons();
-        buttons.push({
-            title: "Add " + this.getDisplayName(),
-            cssClass: "add-button",
+    protected override getButtons() {
+        return [{
+            title: 'Add ' + this.getDisplayName(),
+            cssClass: 'add-button',
             onClick: () => {
                 this.createEntityDialog(this.getItemType(), dlg => {
                     var dialog = dlg as GridEditorDialog<TEntity>;
-                    dialog.onSave = (opt, callback) => this.save(opt, callback);
-                    dialog.loadEntityAndOpenDialog({});
+                    dialog.onSave = (options, callback) => this.save(options, callback);
+                    dialog.loadEntityAndOpenDialog(this.getNewEntity());
                 });
             }
-        });
-        return buttons;
+        }];
     }
 
-    protected editItem(entityOrId: any) {
+    protected override createEntityDialog(itemType: string, callback: (dlg: any) => void) {
+        var dlg = super.createEntityDialog(itemType, callback);
+        if (!dlg) return dlg;
+        return dlg;
+    }
+
+    protected override editItem(entityOrId: any): void {
         var id = entityOrId;
         var item = this.view.getItemById(id);
+
         this.createEntityDialog(this.getItemType(), dlg => {
             var dialog = dlg as GridEditorDialog<TEntity>;
-            dialog.onSave = (opt, callback) => this.save(opt, callback);
+            dialog.onSave = (options, callback) => this.save(options, callback);
             dialog.loadEntityAndOpenDialog(item);
         });
     }
 
-    protected getEditValue(property, target) {
-        target[property] = this.value;
-    }
-
-    protected getGridCanLoad() {
-        return false;
-    }
-
-    protected usePager() {
-        return false;
-    }
-
-    protected getInitialTitle() {
-        return null;
-    }
-
-    private nextId = 1;
-
     protected save(opt: any, callback: (r: any) => void) {
         var request = opt.request;
-        var row = Q.deepClone(request.Entity);
-        var id = this.getID(row);
+        var row = JSON.parse(JSON.stringify(request.Entity));
+        var id = this.getId(row);
         if (id == null) {
             row.__id = this.nextId++;
         }
@@ -80,7 +68,7 @@ export class GridEditorBase<TEntity> extends EntityGrid<TEntity, any> {
         if (id == null) {
             items.push(row);
         } else {
-            var index = items.findIndex(x => this.getID(x) == id);
+            var index = items.findIndex(x => this.getId(x) == id);
             if (index >= 0) {
                 items[index] = row;
             }
@@ -96,47 +84,34 @@ export class GridEditorBase<TEntity> extends EntityGrid<TEntity, any> {
 
     protected setEntities(items: TEntity[]) {
         this.view.setItems(items, true);
-        this.resetCheckedAndRefresh();
     }
 
     protected getNewEntity(): TEntity {
         return {} as TEntity;
     }
 
-    protected getButtons() {
-        return [{
-            title: 'Add',
-            cssClass: 'add-button',
-            onClick: () => {
-                this.createEntityDialog(this.getItemType(), dlg => {
-                    var dialog = dlg as GridEditorDialog<TEntity>;
-                    dialog.onSave = (opt, callback) => this.save(opt, callback);
-                    dialog.loadEntityAndOpenDialog(this.getNewEntity());
-                });
-            }
-        }];
-    }
+    protected override getGridCanLoad() { return false; }
+    protected override usePager() { return false; }
+    protected override getInitialTitle() { return null; }
+    protected override createQuickSearchInput() { }
+
+    private nextId = 1;
 
     public get value(): TEntity[] {
         return this.view.getItems().map(x => {
-            var y = Q.deepClone(x);
+            var y = JSON.parse(JSON.stringify(x));
             delete y['__id'];
             return y;
         });
     }
 
     public set value(value: TEntity[]) {
-        var p = this.getIDProperty();
+        var p = this.getIdProperty();
         this.view.setItems((value || []).map(x => {
-            var y = Q.deepClone(x);
+            var y = JSON.parse(JSON.stringify(x));
             if ((y as any)[p] == null)
                 (y as any)[p] = (y as any).__id = this.nextId++;
             return y;
         }), true);
     }
-
-    protected getGridCanLoad() { return false; }
-    protected usePager() { return false; }
-    protected getInitialTitle() { return null; }
-    protected createQuickSearchInput() { }
 }

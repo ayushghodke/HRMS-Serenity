@@ -2,7 +2,7 @@ import { Decorators, EntityDialog } from '@serenity-is/corelib';
 
 @Decorators.registerClass('HRMS.Common.GridEditorDialog')
 export class GridEditorDialog<TEntity> extends EntityDialog<TEntity, any> {
-    protected getToolbarButtons() {
+    protected override getToolbarButtons() {
         var buttons = super.getToolbarButtons();
         buttons.push({
             title: "Apply",
@@ -14,11 +14,11 @@ export class GridEditorDialog<TEntity> extends EntityDialog<TEntity, any> {
         return buttons;
     }
 
-    protected getService() { return null; }
+    protected override getService() { return null; }
 
     public onSave: (options: any, callback: (response: any) => void) => void;
 
-    protected saveHandler(options: any, callback: (response: any) => void) {
+    protected override saveHandler(options: any, callback: (response: any) => void) {
         this.onSave && this.onSave(options, callback);
     }
 
