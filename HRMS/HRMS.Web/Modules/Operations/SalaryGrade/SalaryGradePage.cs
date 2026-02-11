@@ -9,6 +9,7 @@ public class SalaryGradePage : Controller
     [Route("Operations/SalaryGrade")]
     public ActionResult Index()
     {
-        return this.GridPage<SalaryGradeRow>("@/Modules/Operations/SalaryGrade/SalaryGradePage.tsx");
+        return this.GridPage("@/Operations/SalaryGrade/SalaryGradePage",
+            SalaryGradeRow.Fields.PageTitle());
     }
 }
