@@ -1,5 +1,7 @@
 ﻿export const AdministrationNS: "HRMS.Administration" = "HRMS.Administration";
 export const nsAdministration: "HRMS.Administration." = "HRMS.Administration.";
+export const CommunicationNS: "HRMS.Communication" = "HRMS.Communication";
+export const nsCommunication: "HRMS.Communication." = "HRMS.Communication.";
 export const HRNS: "HRMS.HR" = "HRMS.HR";
 export const nsHR: "HRMS.HR." = "HRMS.HR.";
 export const MembershipNS: "HRMS.Membership" = "HRMS.Membership";

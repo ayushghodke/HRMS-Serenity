@@ -81,6 +81,23 @@ namespace texts {
                 export const Username: string;
             }
         }
+        namespace Communication {
+            export function asKey(): typeof Communication;
+            export function asTry(): typeof Communication;
+            namespace Notice {
+                export function asKey(): typeof Notice;
+                export function asTry(): typeof Notice;
+                export const Description: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const ExpiryDate: string;
+                export const IsActive: string;
+                export const NoticeId: string;
+                export const Priority: string;
+                export const PublishDate: string;
+                export const Title: string;
+            }
+        }
         namespace HR {
             export function asKey(): typeof HR;
             export function asTry(): typeof HR;
@@ -472,6 +489,9 @@ const Texts: typeof texts = proxyTexts({}, '', {
             User: {},
             UserPermission: {},
             UserRole: {}
+        },
+        Communication: {
+            Notice: {}
         },
         HR: {
             Department: {},

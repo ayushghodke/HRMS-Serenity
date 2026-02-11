@@ -15,6 +15,7 @@ public static partial class ESM
     public const string LeaveBalancePage = "~/esm/Modules/Operations/LeaveBalance/LeaveBalancePage.js";
     public const string LeavePage = "~/esm/Modules/Operations/Leave/LeavePage.js";
     public const string LoginPage = "~/esm/Modules/Membership/Account/Login/LoginPage.js";
+    public const string NoticePage = "~/esm/Modules/Communication/Notice/NoticePage.js";
     public const string PayrollPage = "~/esm/Modules/Operations/Payroll/PayrollPage.js";
     public const string RolePage = "~/esm/Modules/Administration/Role/RolePage.js";
     public const string SalaryComponentsPage = "~/esm/Modules/Operations/SalaryComponents/SalaryComponentsPage.js";
@@ -53,6 +54,14 @@ public static partial class ESM
         public static partial class Common
         {
             public const string ScriptInit = "~/esm/Modules/Common/ScriptInit.js";
+        }
+
+        public static partial class Communication
+        {
+            public static partial class Notice
+            {
+                public const string NoticePage = "~/esm/Modules/Communication/Notice/NoticePage.js";
+            }
         }
 
         public static partial class HR

@@ -199,6 +199,53 @@ ViewData["PageId"] = "Dashboard";
     </section>
 
     <section class="col-lg-5">
+        <!-- Notice Board -->
+        <div class="card s-dashboard-card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fa fa-bullhorn text-primary me-2"></i> NOTICE BOARD</h3>
+            </div>
+            <div class="card-body p-0">
+                @if (Model.ActiveNotices != null && Model.ActiveNotices.Any())
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var notice in Model.ActiveNotices)
+                        {
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h5 class="mb-0" style="font-size: 1rem;">@notice.Title</h5>
+                                    @if (notice.Priority == HRMS.Communication.NoticePriority.High)
+                                    {
+                                        <span class="badge bg-danger">Urgent</span>
+                                    }
+                                    else if (notice.Priority == HRMS.Communication.NoticePriority.Normal)
+                                    {
+                                        <span class="badge bg-primary">Normal</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Low</span>
+                                    }
+                                </div>
+                                <small class="text-muted d-block mb-1">
+                                    <i class="fa fa-clock-o me-1"></i> @(notice.PublishDate?.ToString("dd MMM yyyy"))
+                                </small>
+                                <div class="small text-secondary">
+                                    @Html.Raw(notice.Description)
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="text-center p-4 text-muted">
+                        <i class="fa fa-info-circle fa-2x mb-2 opacity-50"></i>
+                        <p class="mb-0">No active notices at this time.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
         <div class="card s-dashboard-card bg-world-map">
             <div class="card-header d-flex">
                 <h3 class="card-title text-white">

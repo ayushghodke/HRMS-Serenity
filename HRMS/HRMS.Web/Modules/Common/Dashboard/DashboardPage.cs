@@ -102,6 +102,15 @@ public class DashboardPage : Controller
                     m.AverageAttendanceRate = totalPossibleAttendance > 0 
                         ? Math.Round((double)actualAttendance / totalPossibleAttendance * 100, 2) 
                         : 0;
+
+                    // Fetch Active Notices
+                    m.ActiveNotices = connection.List<HRMS.Communication.NoticeRow>(q => q
+                        .SelectTableFields()
+                        .Where(HRMS.Communication.NoticeRow.Fields.IsActive == 1)
+                        .Where(HRMS.Communication.NoticeRow.Fields.PublishDate <= DateTime.Now)
+                        .Where(HRMS.Communication.NoticeRow.Fields.ExpiryDate >= DateTime.Now || HRMS.Communication.NoticeRow.Fields.ExpiryDate.IsNull())
+                        .OrderBy(HRMS.Communication.NoticeRow.Fields.Priority, desc: true)
+                        .OrderBy(HRMS.Communication.NoticeRow.Fields.PublishDate, desc: true));
                 }
                 return m;
             });

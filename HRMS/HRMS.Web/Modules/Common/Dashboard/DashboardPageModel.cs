@@ -25,4 +25,6 @@ public class DashboardPageModel
     public int TotalDepartments { get; set; }
     public double AverageAttendanceRate { get; set; }
 
+    // Notices
+    public List<HRMS.Communication.NoticeRow> ActiveNotices { get; set; } = new();
 }
