@@ -13,6 +13,17 @@ public class EmployeeDocsSaveHandler : SaveRequestHandler<MyRow, MyRequest, MyRe
             : base(context) 
     {
     }
+
+    protected override void BeforeSave()
+    {
+        base.BeforeSave();
+        
+        if (IsCreate)
+        {
+            if (Row.UploadedOn == null)
+                Row.UploadedOn = DateTime.Now;
+        }
+    }
 }
 
 public interface IEmployeeDocsDeleteHandler : IDeleteHandler<MyRow, Serenity.Services.DeleteRequest, Serenity.Services.DeleteResponse> {}

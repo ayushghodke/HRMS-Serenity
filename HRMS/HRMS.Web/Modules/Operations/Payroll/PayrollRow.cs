@@ -40,7 +40,7 @@ public sealed class PayrollRow : Row<PayrollRow.RowFields>, IIdRow, INameRow
     [DisplayName("Net Salary"), NotNull, DisplayFormat("#,##0.00")] // Should probably be calculated
     public decimal? NetSalary { get => fields.NetSalary[this]; set => fields.NetSalary[this] = value; }
 
-    [DisplayName("Generated Date"), NotNull, DefaultValue("now")]
+    [DisplayName("Generated Date")]
     public DateTime? GeneratedDate { get => fields.GeneratedDate[this]; set => fields.GeneratedDate[this] = value; }
 
     [DisplayName("Employee Name"), Origin(jEmployee, nameof(EmployeeRow.FullName)), QuickSearch, NameProperty]

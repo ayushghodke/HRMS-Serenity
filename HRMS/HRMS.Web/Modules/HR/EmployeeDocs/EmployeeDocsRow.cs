@@ -54,7 +54,7 @@ public sealed class EmployeeDocsRow : Row<EmployeeDocsRow.RowFields>, IIdRow
         set => fields.FilePath[this] = value;
     }
 
-    [DisplayName("Uploaded On"), NotNull, DefaultValue("now")]
+    [DisplayName("Uploaded On")]
     public DateTime? UploadedOn
     {
         get => fields.UploadedOn[this];
