@@ -16,6 +16,8 @@ public static partial class ESM
     public const string LoginPage = "~/esm/Modules/Membership/Account/Login/LoginPage.js";
     public const string PayrollPage = "~/esm/Modules/Operations/Payroll/PayrollPage.js";
     public const string RolePage = "~/esm/Modules/Administration/Role/RolePage.js";
+    public const string SalaryComponentsPage = "~/esm/Modules/Operations/SalaryComponents/SalaryComponentsPage.js";
+    public const string SalaryGradePage = "~/esm/Modules/Operations/SalaryGrade/SalaryGradePage.js";
     public const string ScriptInit = "~/esm/Modules/Common/ScriptInit.js";
     public const string SignUpPage = "~/esm/Modules/Membership/Account/SignUp/SignUpPage.js";
     public const string TaskPage = "~/esm/Modules/Operations/Task/TaskPage.js";
@@ -111,6 +113,16 @@ public static partial class ESM
             public static partial class Payroll
             {
                 public const string PayrollPage = "~/esm/Modules/Operations/Payroll/PayrollPage.js";
+            }
+
+            public static partial class SalaryComponents
+            {
+                public const string SalaryComponentsPage = "~/esm/Modules/Operations/SalaryComponents/SalaryComponentsPage.js";
+            }
+
+            public static partial class SalaryGrade
+            {
+                public const string SalaryGradePage = "~/esm/Modules/Operations/SalaryGrade/SalaryGradePage.js";
             }
 
             public static partial class Task

@@ -241,6 +241,23 @@ namespace texts {
                 export const PayrollId: string;
                 export const Year: string;
             }
+            namespace SalaryComponents {
+                export function asKey(): typeof SalaryComponents;
+                export function asTry(): typeof SalaryComponents;
+                export const CalculationType: string;
+                export const ComponentId: string;
+                export const ComponentName: string;
+                export const ComponentType: string;
+                export const Description: string;
+                export const DisplayOrder: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const IsActive: string;
+                export const IsStatutory: string;
+                export const IsTaxable: string;
+                export const PercentageOf: string;
+                export const PercentageOfComponentName: string;
+            }
             namespace Task {
                 export function asKey(): typeof Task;
                 export function asTry(): typeof Task;
@@ -426,6 +443,7 @@ const Texts: typeof texts = proxyTexts({}, '', {
             Leave: {},
             LeaveBalance: {},
             Payroll: {},
+            SalaryComponents: {},
             Task: {}
         },
         Recruitment: {
