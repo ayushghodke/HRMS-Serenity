@@ -1,4 +1,4 @@
-import { gridPage } from '@serenity-is/corelib';
+import { gridPageInit } from '@serenity-is/corelib';
 import { NoticeGrid } from './NoticeGrid';
 
-export default () => gridPage(NoticeGrid);
+export default () => gridPageInit(NoticeGrid);
