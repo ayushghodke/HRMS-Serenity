@@ -372,6 +372,7 @@ namespace texts {
                 export const IsCompleted: string;
                 export const Rating: string;
                 export const Round: string;
+                export const Status: string;
             }
             namespace JobOpenings {
                 export function asKey(): typeof JobOpenings;

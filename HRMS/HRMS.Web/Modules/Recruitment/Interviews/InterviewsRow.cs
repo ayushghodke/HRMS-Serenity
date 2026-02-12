@@ -39,6 +39,9 @@ public sealed class InterviewsRow : Row<InterviewsRow.RowFields>, IIdRow
     [DisplayName("Comments"), Size(int.MaxValue)]
     public string Comments { get => fields.Comments[this]; set => fields.Comments[this] = value; }
 
+    [DisplayName("Status"), NotNull, DefaultValue(InterviewStatus.Scheduled)]
+    public InterviewStatus? Status { get => (InterviewStatus?)fields.Status[this]; set => fields.Status[this] = (int?)value; }
+
     [DisplayName("Interview Done"), NotNull, DefaultValue(false)]
     public bool? IsCompleted { get => fields.IsCompleted[this]; set => fields.IsCompleted[this] = value; }
 
@@ -60,12 +63,23 @@ public sealed class InterviewsRow : Row<InterviewsRow.RowFields>, IIdRow
         public Int32Field Round;
         public Int32Field Rating;
         public StringField Comments;
+        public Int32Field Status;
         public BooleanField IsCompleted;
         public DateTimeField CompletedOn;
 
         public StringField CandidateName;
         public StringField InterviewerName;
     }
+}
+
+public enum InterviewStatus
+{
+    [Description("Scheduled")]
+    Scheduled = 1,
+    [Description("Interviewed")]
+    Interviewed = 2,
+    [Description("Cancelled")]
+    Cancelled = -1
 }
 
 public enum InterviewRound

@@ -8,6 +8,7 @@ export * from "./Recruitment/InterviewsColumns";
 export * from "./Recruitment/InterviewsForm";
 export * from "./Recruitment/InterviewsRow";
 export * from "./Recruitment/InterviewsService";
+export * from "./Recruitment/InterviewStatus";
 export * from "./Recruitment/JobOpeningsColumns";
 export * from "./Recruitment/JobOpeningsForm";
 export * from "./Recruitment/JobOpeningsRow";

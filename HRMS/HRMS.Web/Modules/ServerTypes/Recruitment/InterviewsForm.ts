@@ -1,5 +1,6 @@
-﻿import { BooleanEditor, DateEditor, EnumEditor, initFormType, IntegerEditor, LookupEditor, PrefixedContext, TextAreaEditor } from "@serenity-is/corelib";
+﻿import { DateEditor, EnumEditor, initFormType, IntegerEditor, LookupEditor, PrefixedContext, TextAreaEditor } from "@serenity-is/corelib";
 import { InterviewRound } from "./InterviewRound";
+import { InterviewStatus } from "./InterviewStatus";
 
 export interface InterviewsForm {
     CandidateId: LookupEditor;
@@ -8,7 +9,7 @@ export interface InterviewsForm {
     Round: EnumEditor;
     Rating: IntegerEditor;
     Comments: TextAreaEditor;
-    IsCompleted: BooleanEditor;
+    Status: EnumEditor;
 }
 
 export class InterviewsForm extends PrefixedContext {
@@ -26,7 +27,6 @@ export class InterviewsForm extends PrefixedContext {
             var w2 = EnumEditor;
             var w3 = IntegerEditor;
             var w4 = TextAreaEditor;
-            var w5 = BooleanEditor;
 
             initFormType(InterviewsForm, [
                 'CandidateId', w0,
@@ -35,10 +35,10 @@ export class InterviewsForm extends PrefixedContext {
                 'Round', w2,
                 'Rating', w3,
                 'Comments', w4,
-                'IsCompleted', w5
+                'Status', w2
             ]);
         }
     }
 }
 
-[InterviewRound]; // referenced types
+[InterviewRound, InterviewStatus]; // referenced types

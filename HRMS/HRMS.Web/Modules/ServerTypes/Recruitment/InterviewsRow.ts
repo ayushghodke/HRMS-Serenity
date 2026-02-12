@@ -1,5 +1,6 @@
 ﻿import { fieldsProxy, getLookup, getLookupAsync } from "@serenity-is/corelib";
 import { InterviewRound } from "./InterviewRound";
+import { InterviewStatus } from "./InterviewStatus";
 
 export interface InterviewsRow {
     InterviewId?: number;
@@ -9,6 +10,7 @@ export interface InterviewsRow {
     Round?: InterviewRound;
     Rating?: number;
     Comments?: string;
+    Status?: InterviewStatus;
     IsCompleted?: boolean;
     CompletedOn?: string;
     CandidateName?: string;

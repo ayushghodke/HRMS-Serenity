@@ -13,6 +13,17 @@ public class InterviewsSaveHandler(IRequestContext context) :
     {
         base.BeforeSave();
 
+        // Sync Status -> IsCompleted
+        // If Status is Interviewed, mark as Completed.
+        // Otherwise (Scheduled, Cancelled), mark as Not Completed.
+        // We check Row.Status (new value) and fall back to Old.Status (existing value) for updates.
+        var status = Row.Status ?? (IsCreate ? InterviewStatus.Scheduled : Old.Status ?? InterviewStatus.Scheduled);
+
+        if (status == InterviewStatus.Interviewed)
+            Row.IsCompleted = true;
+        else
+            Row.IsCompleted = false;
+
         if (Row.IsCompleted == true)
             Row.CompletedOn = Row.CompletedOn ?? DateTime.Now;
         else

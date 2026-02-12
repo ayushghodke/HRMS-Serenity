@@ -10,7 +10,7 @@ export interface InterviewsColumns {
     InterviewDate: Column<InterviewsRow>;
     Round: Column<InterviewsRow>;
     Rating: Column<InterviewsRow>;
-    IsCompleted: Column<InterviewsRow>;
+    Status: Column<InterviewsRow>;
     CompletedOn: Column<InterviewsRow>;
     Comments: Column<InterviewsRow>;
 }
