@@ -1,8 +1,8 @@
-﻿import { DateEditor, EnumEditor, initFormType, IntegerEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
+﻿import { DateEditor, EnumEditor, initFormType, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 import { CandidateStatus } from "./CandidateStatus";
 
 export interface CandidatesForm {
-    JobId: IntegerEditor;
+    JobId: LookupEditor;
     FirstName: StringEditor;
     LastName: StringEditor;
     Email: StringEditor;
@@ -22,7 +22,7 @@ export class CandidatesForm extends PrefixedContext {
         if (!CandidatesForm.init) {
             CandidatesForm.init = true;
 
-            var w0 = IntegerEditor;
+            var w0 = LookupEditor;
             var w1 = StringEditor;
             var w2 = EnumEditor;
             var w3 = DateEditor;

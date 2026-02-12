@@ -20,6 +20,7 @@ public sealed class CandidatesRow : Row<CandidatesRow.RowFields>, IIdRow, INameR
     public int? CandidateId { get => fields.CandidateId[this]; set => fields.CandidateId[this] = value; }
 
     [DisplayName("Job"), NotNull, ForeignKey("JobOpenings", "JobId"), LeftJoin(jJob), TextualField(nameof(JobTitle))]
+    [LookupEditor(typeof(JobOpeningsRow))]
     public int? JobId { get => fields.JobId[this]; set => fields.JobId[this] = value; }
 
     [DisplayName("First Name"), Size(100), NotNull, QuickSearch, NameProperty]

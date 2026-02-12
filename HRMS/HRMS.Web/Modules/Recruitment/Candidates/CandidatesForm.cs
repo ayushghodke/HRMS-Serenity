@@ -4,6 +4,7 @@ namespace HRMS.Recruitment.Forms;
 [BasedOnRow(typeof(CandidatesRow), CheckNames = true)]
 public class CandidatesForm
 {
+    [LookupEditor(typeof(JobOpeningsRow))]
     public int JobId { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
