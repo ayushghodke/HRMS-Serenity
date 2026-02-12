@@ -13,6 +13,7 @@ public class CandidatesColumns
     public string Email { get; set; }
     public string Mobile { get; set; }
     public string ResumePath { get; set; }
-    public int Status { get; set; }
+    [DisplayName("Progress Status")]
+    public CandidateStatus Status { get; set; }
     public DateTime AppliedDate { get; set; }
 }

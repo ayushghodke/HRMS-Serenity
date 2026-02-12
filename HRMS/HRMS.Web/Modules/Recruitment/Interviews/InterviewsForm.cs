@@ -17,4 +17,6 @@ public class InterviewsForm
     public int Rating { get; set; }
     [TextAreaEditor(Rows = 3)]
     public string Comments { get; set; }
+    [DisplayName("Interview Done")]
+    public bool IsCompleted { get; set; }
 }

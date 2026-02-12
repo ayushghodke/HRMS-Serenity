@@ -9,6 +9,8 @@ export interface InterviewsRow {
     Round?: InterviewRound;
     Rating?: number;
     Comments?: string;
+    IsCompleted?: boolean;
+    CompletedOn?: string;
     CandidateName?: string;
     InterviewerName?: string;
 }

@@ -1,12 +1,12 @@
 @using Serenity
 @using Serenity.Web
 @{
-    ViewData["Title"] = "Candidate Kanban Board";
+    ViewData["Title"] = "Candidate Progress Kanban";
 }
 
 <div id="kanban-container">
     <div class="kanban-header">
-        <h2><i class="fa fa-trello"></i> Recruitment Pipeline</h2>
+        <h2><i class="fa fa-trello"></i> Candidate Progress Pipeline</h2>
         <button id="refresh-kanban" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>
     </div>
 
@@ -217,6 +217,7 @@
 
 <script type="text/javascript">
     var candidates = [];
+    var candidateProgressSyncKey = 'hrms:candidate-progress-changed';
 
     function loadCandidates() {
         Q.serviceRequest('Recruitment/Candidates/List', {}, function(response) {
@@ -232,7 +233,7 @@
             document.getElementById('count-' + i).textContent = '0';
         }
 
-        // Group candidates by status
+        // Group candidates by progress status
         var grouped = {};
         candidates.forEach(function(candidate) {
             var status = candidate.Status || 1;
@@ -291,7 +292,8 @@
             CandidateId: parseInt(candidateId),
             NewStatus: parseInt(newStatus)
         }, function() {
-            Q.notifySuccess('Candidate status updated successfully!');
+            Q.notifySuccess('Candidate progress updated successfully!');
+            notifyCandidateProgressChanged();
             loadCandidates(); // Refresh
         }, {
             onError: function(response) {
@@ -301,7 +303,28 @@
         });
     }
 
+    function notifyCandidateProgressChanged() {
+        window.dispatchEvent(new Event('candidate-progress-changed'));
+
+        try {
+            window.localStorage.setItem(candidateProgressSyncKey, new Date().toISOString());
+        } catch (e) {
+        }
+    }
+
+    function setupAutoRefreshSync() {
+        window.addEventListener('candidate-progress-changed', function() {
+            loadCandidates();
+        });
+
+        window.addEventListener('storage', function(event) {
+            if (event.key === candidateProgressSyncKey)
+                loadCandidates();
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        setupAutoRefreshSync();
         loadCandidates();
 
         // Initialize SortableJS for each column

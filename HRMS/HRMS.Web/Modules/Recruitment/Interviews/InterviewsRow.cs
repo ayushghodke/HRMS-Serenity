@@ -39,6 +39,12 @@ public sealed class InterviewsRow : Row<InterviewsRow.RowFields>, IIdRow
     [DisplayName("Comments"), Size(int.MaxValue)]
     public string Comments { get => fields.Comments[this]; set => fields.Comments[this] = value; }
 
+    [DisplayName("Interview Done"), NotNull, DefaultValue(false)]
+    public bool? IsCompleted { get => fields.IsCompleted[this]; set => fields.IsCompleted[this] = value; }
+
+    [DisplayName("Completed On")]
+    public DateTime? CompletedOn { get => fields.CompletedOn[this]; set => fields.CompletedOn[this] = value; }
+
     [DisplayName("Candidate"), Expression($"{jCandidate}.[FirstName] + ' ' + {jCandidate}.[LastName]"), MinSelectLevel(SelectLevel.List)]
     public string CandidateName { get => fields.CandidateName[this]; set => fields.CandidateName[this] = value; }
 
@@ -54,6 +60,8 @@ public sealed class InterviewsRow : Row<InterviewsRow.RowFields>, IIdRow
         public Int32Field Round;
         public Int32Field Rating;
         public StringField Comments;
+        public BooleanField IsCompleted;
+        public DateTimeField CompletedOn;
 
         public StringField CandidateName;
         public StringField InterviewerName;

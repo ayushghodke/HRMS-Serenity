@@ -362,12 +362,14 @@ namespace texts {
                 export const CandidateId: string;
                 export const CandidateName: string;
                 export const Comments: string;
+                export const CompletedOn: string;
                 export const EntityPlural: string;
                 export const EntitySingular: string;
                 export const InterviewDate: string;
                 export const InterviewId: string;
                 export const InterviewerId: string;
                 export const InterviewerName: string;
+                export const IsCompleted: string;
                 export const Rating: string;
                 export const Round: string;
             }

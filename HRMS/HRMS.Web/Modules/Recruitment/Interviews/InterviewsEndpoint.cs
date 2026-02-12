@@ -7,6 +7,7 @@ using System;
 using System.Data;
 using System.Globalization;
 using MyRow = HRMS.Recruitment.InterviewsRow;
+using CandidateRow = HRMS.Recruitment.CandidatesRow;
 
 namespace HRMS.Recruitment.Endpoints;
 
@@ -59,4 +60,35 @@ public class InterviewsEndpoint : ServiceEndpoint
         return ExcelContentResult.Create(bytes, "InterviewsList_" +
             DateTime.Now.ToString("yyyyMMdd_HHmmss", CultureInfo.InvariantCulture) + ".xlsx");
     }
+
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public ServiceResponse MarkDone(IUnitOfWork uow, [FromBody] MarkInterviewDoneRequest request)
+    {
+        var interview = uow.Connection.TryFirst<MyRow>(MyRow.Fields.InterviewId == request.InterviewId);
+        if (interview == null)
+            throw new ValidationError("InterviewNotFound", "Interview not found.");
+
+        uow.Connection.UpdateById(new MyRow
+        {
+            InterviewId = request.InterviewId,
+            IsCompleted = true,
+            CompletedOn = DateTime.Now
+        });
+
+        if (interview.CandidateId != null)
+        {
+            uow.Connection.UpdateById(new CandidateRow
+            {
+                CandidateId = interview.CandidateId,
+                Status = CandidateStatus.Interviewed
+            });
+        }
+
+        return new ServiceResponse();
+    }
+}
+
+public class MarkInterviewDoneRequest
+{
+    public int InterviewId { get; set; }
 }

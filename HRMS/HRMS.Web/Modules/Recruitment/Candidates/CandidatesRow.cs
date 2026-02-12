@@ -37,7 +37,7 @@ public sealed class CandidatesRow : Row<CandidatesRow.RowFields>, IIdRow, INameR
     [DisplayName("Resume Path"), Size(500)]
     public string ResumePath { get => fields.ResumePath[this]; set => fields.ResumePath[this] = value; }
 
-    [DisplayName("Status"), NotNull, DefaultValue(CandidateStatus.Applied)]
+    [DisplayName("Progress Status"), NotNull, DefaultValue(CandidateStatus.Applied)]
     public CandidateStatus? Status { get => (CandidateStatus?)fields.Status[this]; set => fields.Status[this] = (int?)value; }
 
     [DisplayName("Applied Date"), NotNull]
@@ -68,7 +68,7 @@ public enum CandidateStatus
     Applied = 1,
     [Description("Shortlisted")]
     Shortlisted = 2,
-    [Description("Interviewed")]
+    [Description("Interview Completed")]
     Interviewed = 3,
     [Description("Offered")]
     Offered = 4,

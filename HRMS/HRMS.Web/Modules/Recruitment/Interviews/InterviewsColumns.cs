@@ -14,5 +14,7 @@ public class InterviewsColumns
     public DateTime InterviewDate { get; set; }
     public int Round { get; set; }
     public int Rating { get; set; }
+    public bool IsCompleted { get; set; }
+    public DateTime? CompletedOn { get; set; }
     public string Comments { get; set; }
 }
