@@ -3,8 +3,19 @@ import { CandidatesColumns, CandidatesRow, CandidatesService } from '../../Serve
 import { CandidatesDialog } from './CandidatesDialog';
 import { InterviewsDialog } from '../Interviews/InterviewsDialog';
 
+class ScheduleInterviewDialog extends InterviewsDialog {
+    constructor(private readonly candidateId: number) {
+        super();
+    }
+
+    protected override afterLoadEntity() {
+        super.afterLoadEntity();
+        this.form.CandidateId.value = this.candidateId?.toString();
+    }
+}
+
 export class CandidatesGrid extends EntityGrid<CandidatesRow> {
-    static override [Symbol.typeInfo] = this.registerClass("HRMS.Recruitment.");
+    static override [Symbol.typeInfo] = this.registerClass("HRMS.Recruitment.CandidatesGrid");
 
     protected override getColumnsKey() { return CandidatesColumns.columnsKey; }
     protected override getDialogType() { return CandidatesDialog; }
@@ -20,7 +31,7 @@ export class CandidatesGrid extends EntityGrid<CandidatesRow> {
             width: 180,
             minWidth: 160,
             maxWidth: 220,
-            format: () => '<a href="javascript:;" class="schedule-interview-link"><i class="fa fa-calendar"></i> Schedule Interview</a>'
+            format: ctx => `<a href="javascript:;" class="schedule-interview-link" data-candidate-id="${ctx.item?.CandidateId ?? ''}"><i class="fa fa-calendar"></i> Schedule Interview</a>`
         } as any);
 
         return columns;
@@ -34,14 +45,14 @@ export class CandidatesGrid extends EntityGrid<CandidatesRow> {
             e.preventDefault();
             e.stopPropagation();
 
-            const item = this.itemAt(row) as CandidatesRow;
-            if (!item?.CandidateId)
+            const candidateIdText = scheduleLink.getAttribute('data-candidate-id');
+            const candidateId = candidateIdText ? parseInt(candidateIdText, 10) : NaN;
+
+            if (!Number.isFinite(candidateId) || candidateId <= 0)
                 return;
 
-            const interviewDialog = new InterviewsDialog();
-            interviewDialog.loadEntityAndOpenDialog({
-                CandidateId: item.CandidateId
-            });
+            const interviewDialog = new ScheduleInterviewDialog(candidateId);
+            interviewDialog.loadNewAndOpenDialog();
 
             return;
         }
