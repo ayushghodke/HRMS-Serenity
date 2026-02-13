@@ -353,7 +353,7 @@ namespace texts {
                 export const JobTitle: string;
                 export const LastName: string;
                 export const Mobile: string;
-                export const ResumePath: string;
+                export const Resume: string;
                 export const Status: string;
             }
             namespace Interviews {

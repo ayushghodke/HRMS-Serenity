@@ -35,8 +35,8 @@ public sealed class CandidatesRow : Row<CandidatesRow.RowFields>, IIdRow, INameR
     [DisplayName("Mobile"), Size(20)]
     public string Mobile { get => fields.Mobile[this]; set => fields.Mobile[this] = value; }
 
-    [DisplayName("Resume Path"), Size(500)]
-    public string ResumePath { get => fields.ResumePath[this]; set => fields.ResumePath[this] = value; }
+    [DisplayName("Resume"), Size(1000), FileUploadEditor(FilenameFormat = "CandidateResumes/~", CopyToHistory = true)]
+    public string Resume { get => fields.Resume[this]; set => fields.Resume[this] = value; }
 
     [DisplayName("Progress Status"), NotNull, DefaultValue(CandidateStatus.Applied)]
     public CandidateStatus? Status { get => (CandidateStatus?)fields.Status[this]; set => fields.Status[this] = (int?)value; }
@@ -55,7 +55,7 @@ public sealed class CandidatesRow : Row<CandidatesRow.RowFields>, IIdRow, INameR
         public StringField LastName;
         public StringField Email;
         public StringField Mobile;
-        public StringField ResumePath;
+        public StringField Resume;
         public Int32Field Status;
         public DateTimeField AppliedDate;
 

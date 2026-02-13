@@ -1,4 +1,4 @@
-﻿import { DateEditor, EnumEditor, initFormType, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
+﻿import { DateEditor, EnumEditor, ImageUploadEditor, initFormType, LookupEditor, PrefixedContext, StringEditor } from "@serenity-is/corelib";
 import { CandidateStatus } from "./CandidateStatus";
 
 export interface CandidatesForm {
@@ -7,7 +7,7 @@ export interface CandidatesForm {
     LastName: StringEditor;
     Email: StringEditor;
     Mobile: StringEditor;
-    ResumePath: StringEditor;
+    Resume: ImageUploadEditor;
     Status: EnumEditor;
     AppliedDate: DateEditor;
 }
@@ -24,8 +24,9 @@ export class CandidatesForm extends PrefixedContext {
 
             var w0 = LookupEditor;
             var w1 = StringEditor;
-            var w2 = EnumEditor;
-            var w3 = DateEditor;
+            var w2 = ImageUploadEditor;
+            var w3 = EnumEditor;
+            var w4 = DateEditor;
 
             initFormType(CandidatesForm, [
                 'JobId', w0,
@@ -33,9 +34,9 @@ export class CandidatesForm extends PrefixedContext {
                 'LastName', w1,
                 'Email', w1,
                 'Mobile', w1,
-                'ResumePath', w1,
-                'Status', w2,
-                'AppliedDate', w3
+                'Resume', w2,
+                'Status', w3,
+                'AppliedDate', w4
             ]);
         }
     }

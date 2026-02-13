@@ -10,7 +10,7 @@ export interface CandidatesColumns {
     LastName: Column<CandidatesRow>;
     Email: Column<CandidatesRow>;
     Mobile: Column<CandidatesRow>;
-    ResumePath: Column<CandidatesRow>;
+    Resume: Column<CandidatesRow>;
     Status: Column<CandidatesRow>;
     AppliedDate: Column<CandidatesRow>;
 }

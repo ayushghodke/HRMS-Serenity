@@ -8,7 +8,7 @@ export interface CandidatesRow {
     LastName?: string;
     Email?: string;
     Mobile?: string;
-    ResumePath?: string;
+    Resume?: string;
     Status?: CandidateStatus;
     AppliedDate?: string;
     JobTitle?: string;
