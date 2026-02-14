@@ -236,7 +236,7 @@
         // Group candidates by progress status
         var grouped = {};
         candidates.forEach(function(candidate) {
-            var status = candidate.Status || 1;
+            var status = (candidate.Status !== null && candidate.Status !== undefined) ? candidate.Status : 1;
             if (!grouped[status]) grouped[status] = [];
             grouped[status].push(candidate);
         });
