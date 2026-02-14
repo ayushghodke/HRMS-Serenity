@@ -16,6 +16,7 @@ export interface EmployeeRow {
     Gender?: Gender;
     DateOfBirth?: string;
     JoiningDate?: string;
+    PaidLeavesPerMonth?: number;
     DepartmentId?: number;
     DesignationId?: number;
     ManagerId?: number;

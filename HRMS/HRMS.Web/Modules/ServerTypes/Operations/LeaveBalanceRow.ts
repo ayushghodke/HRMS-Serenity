@@ -11,6 +11,7 @@ export interface LeaveBalanceRow {
     Balance?: number;
     EmployeeFullName?: string;
     EmployeeJoinDate?: string;
+    EmployeePaidLeavesPerMonth?: number;
     MonthsWorked?: number;
     AccruedLeaves?: number;
     RemainingLeaves?: number;

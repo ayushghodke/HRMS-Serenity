@@ -7,13 +7,18 @@ public static partial class ESM
     public const string CandidatesPage = "~/esm/Modules/Recruitment/Candidates/CandidatesPage.js";
     public const string DepartmentPage = "~/esm/Modules/HR/Department/DepartmentPage.js";
     public const string DesignationPage = "~/esm/Modules/HR/Designation/DesignationPage.js";
+    public const string EmployeeLeaveProfilePage = "~/esm/Modules/Operations/EmployeeLeaveProfile/EmployeeLeaveProfilePage.js";
     public const string EmployeePage = "~/esm/Modules/HR/Employee/EmployeePage.js";
     public const string EmployeeSalaryPage = "~/esm/Modules/HR/EmployeeSalary/EmployeeSalaryPage.js";
+    public const string HolidayPage = "~/esm/Modules/Operations/Holiday/HolidayPage.js";
     public const string InterviewsPage = "~/esm/Modules/Recruitment/Interviews/InterviewsPage.js";
     public const string JobOpeningsPage = "~/esm/Modules/Recruitment/JobOpenings/JobOpeningsPage.js";
     public const string LanguagePage = "~/esm/Modules/Administration/Language/LanguagePage.js";
+    public const string LeaveApprovalPage = "~/esm/Modules/Operations/LeaveApproval/LeaveApprovalPage.js";
     public const string LeaveBalancePage = "~/esm/Modules/Operations/LeaveBalance/LeaveBalancePage.js";
     public const string LeavePage = "~/esm/Modules/Operations/Leave/LeavePage.js";
+    public const string LeavePolicyPage = "~/esm/Modules/Operations/LeavePolicy/LeavePolicyPage.js";
+    public const string LeaveTypePage = "~/esm/Modules/Operations/LeaveType/LeaveTypePage.js";
     public const string LoginPage = "~/esm/Modules/Membership/Account/Login/LoginPage.js";
     public const string NoticePage = "~/esm/Modules/Communication/Notice/NoticePage.js";
     public const string PayrollPage = "~/esm/Modules/Operations/Payroll/PayrollPage.js";
@@ -115,14 +120,39 @@ public static partial class ESM
                 public const string AttendancePage = "~/esm/Modules/Operations/Attendance/AttendancePage.js";
             }
 
+            public static partial class EmployeeLeaveProfile
+            {
+                public const string EmployeeLeaveProfilePage = "~/esm/Modules/Operations/EmployeeLeaveProfile/EmployeeLeaveProfilePage.js";
+            }
+
+            public static partial class Holiday
+            {
+                public const string HolidayPage = "~/esm/Modules/Operations/Holiday/HolidayPage.js";
+            }
+
             public static partial class Leave
             {
                 public const string LeavePage = "~/esm/Modules/Operations/Leave/LeavePage.js";
             }
 
+            public static partial class LeaveApproval
+            {
+                public const string LeaveApprovalPage = "~/esm/Modules/Operations/LeaveApproval/LeaveApprovalPage.js";
+            }
+
             public static partial class LeaveBalance
             {
                 public const string LeaveBalancePage = "~/esm/Modules/Operations/LeaveBalance/LeaveBalancePage.js";
+            }
+
+            public static partial class LeavePolicy
+            {
+                public const string LeavePolicyPage = "~/esm/Modules/Operations/LeavePolicy/LeavePolicyPage.js";
+            }
+
+            public static partial class LeaveType
+            {
+                public const string LeaveTypePage = "~/esm/Modules/Operations/LeaveType/LeaveTypePage.js";
             }
 
             public static partial class Payroll

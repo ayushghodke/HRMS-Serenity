@@ -10,4 +10,12 @@ public class EmployeeSaveHandler : SaveRequestHandler<MyRow, SaveRequest<MyRow>,
     public EmployeeSaveHandler(IRequestContext context) : base(context)
     {
     }
+
+    protected override void BeforeSave()
+    {
+        base.BeforeSave();
+
+        if (!Row.PaidLeavesPerMonth.HasValue || Row.PaidLeavesPerMonth.Value < 0)
+            Row.PaidLeavesPerMonth = 2;
+    }
 }

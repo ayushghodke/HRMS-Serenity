@@ -17,6 +17,11 @@ using MyPages = HRMS.Operations.Pages;
 
 // Leave Management Submenu
 [assembly: NavigationMenu(2100, "Operations/Leave Management", icon: "fa-calendar-check-o")]
+[assembly: NavigationLink(2100, "Operations/Leave Management/Leave Types", typeof(MyPages.LeaveTypePage), icon: "fa-tags")]
+[assembly: NavigationLink(2100, "Operations/Leave Management/Holidays", typeof(MyPages.HolidayPage), icon: "fa-calendar-o")]
+[assembly: NavigationLink(2100, "Operations/Leave Management/Leave Policies", typeof(MyPages.LeavePolicyPage), icon: "fa-shield")]
+[assembly: NavigationLink(2100, "Operations/Leave Management/Employee Leave Profiles", typeof(MyPages.EmployeeLeaveProfilePage), icon: "fa-id-badge")]
 [assembly: NavigationLink(2101, "Operations/Leave Management/Leave Requests", typeof(MyPages.LeavePage), icon: "fa-calendar-minus-o")]
+[assembly: NavigationLink(2101, "Operations/Leave Management/Leave Approvals", typeof(MyPages.LeaveApprovalPage), icon: "fa-check-square-o")]
 [assembly: NavigationLink(2102, "Operations/Leave Management/Leave Balances", typeof(MyPages.LeaveBalancePage), icon: "fa-balance-scale")]
 [assembly: NavigationLink(2103, "Operations/Leave Management/Leave Calendar", typeof(MyPages.LeaveCalendarPage), icon: "fa-calendar")]

@@ -9,6 +9,8 @@ public class LeaveBalanceColumns
 {
     [EditLink, Width(200)]
     public string EmployeeFullName { get; set; }
+    public LeaveType LeaveType { get; set; }
+    public int EmployeePaidLeavesPerMonth { get; set; }
     public DateTime EmployeeJoinDate { get; set; }
     public int MonthsWorked { get; set; }
     public int AccruedLeaves { get; set; }

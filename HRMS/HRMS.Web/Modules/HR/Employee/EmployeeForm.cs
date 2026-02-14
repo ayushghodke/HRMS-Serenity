@@ -17,6 +17,7 @@ public class EmployeeForm
 
     [Tab("Employment")]
     public DateTime JoiningDate { get; set; }
+    public int PaidLeavesPerMonth { get; set; }
     public int DepartmentId { get; set; }
     public int DesignationId { get; set; }
     public int ManagerId { get; set; }

@@ -76,49 +76,70 @@ public class LeaveBalanceEndpoint : ServiceEndpoint
         
         foreach (var employee in employees)
         {
-            // Calculate total used leaves for this employee for Paid Leave type
-            // Note: We count ALL approved leaves regardless of year since accrual is cumulative from join date
-            // or we could limit to current year if "Allocated" was annual. 
-            // With monthly accrual model, it's safer to sum all usage if we assume Accrued is total since joining.
-            // However, typically "Used" field in database might be per year. 
-            // Let's assume for now we sum all approved paid leaves for this employee.
-            
-            var usedLeaves = 0m;
+            var usedPaid = 0m;
+            var usedUnpaid = 0m;
             var leaves = uow.Connection.List<Operations.LeaveRow>(
                 leaveFld.EmployeeId == employee.EmployeeId.Value &
-                leaveFld.LeaveType == (int)Operations.LeaveType.PaidLeave &
                 leaveFld.Status == (int)Operations.LeaveStatus.Approved);
-                
+
             foreach (var leave in leaves)
             {
-                usedLeaves += (decimal)(leave.TotalDays ?? 0);
+                var totalDays = (decimal)(leave.TotalDays ?? 0);
+                usedPaid += leave.PaidDays ?? (leave.LeaveType == Operations.LeaveType.PaidLeave ? totalDays : 0m);
+                usedUnpaid += leave.UnpaidDays ?? (leave.LeaveType == Operations.LeaveType.Unpaid ? totalDays : 0m);
             }
 
-            // Check if balance record exists
-            var existingBalance = uow.Connection.TryFirst<MyRow>(
+            var annualPaidAllocation = Math.Max(0, (employee.PaidLeavesPerMonth ?? 2) * 12);
+
+            var existingPaidBalance = uow.Connection.TryFirst<MyRow>(
                 balanceFld.EmployeeId == employee.EmployeeId.Value &
                 balanceFld.LeaveType == (int)Operations.LeaveType.PaidLeave &
                 balanceFld.Year == currentYear);
-            
-            if (existingBalance != null)
+
+            if (existingPaidBalance != null)
             {
-                // Update existing record with correct usage
                 uow.Connection.UpdateById(new MyRow
                 {
-                    LeaveBalanceId = existingBalance.LeaveBalanceId,
-                    Used = usedLeaves
+                    LeaveBalanceId = existingPaidBalance.LeaveBalanceId,
+                    Allocated = annualPaidAllocation,
+                    Used = usedPaid
                 });
             }
             else
             {
-                // Create new record with correct usage
                 uow.Connection.Insert(new MyRow
                 {
                     EmployeeId = employee.EmployeeId.Value,
                     LeaveType = Operations.LeaveType.PaidLeave,
                     Year = currentYear,
-                    Allocated = 36, 
-                    Used = usedLeaves
+                    Allocated = annualPaidAllocation,
+                    Used = usedPaid
+                });
+            }
+
+            var existingUnpaidBalance = uow.Connection.TryFirst<MyRow>(
+                balanceFld.EmployeeId == employee.EmployeeId.Value &
+                balanceFld.LeaveType == (int)Operations.LeaveType.Unpaid &
+                balanceFld.Year == currentYear);
+
+            if (existingUnpaidBalance != null)
+            {
+                uow.Connection.UpdateById(new MyRow
+                {
+                    LeaveBalanceId = existingUnpaidBalance.LeaveBalanceId,
+                    Allocated = 0,
+                    Used = usedUnpaid
+                });
+            }
+            else
+            {
+                uow.Connection.Insert(new MyRow
+                {
+                    EmployeeId = employee.EmployeeId.Value,
+                    LeaveType = Operations.LeaveType.Unpaid,
+                    Year = currentYear,
+                    Allocated = 0,
+                    Used = usedUnpaid
                 });
             }
             

@@ -8,9 +8,7 @@
     <div class="calendar-header">
         <h2><i class="fa fa-calendar"></i> Leave Calendar</h2>
         <div class="calendar-legend">
-            <span class="legend-item casual"><span class="color-box"></span> Casual</span>
-            <span class="legend-item sick"><span class="color-box"></span> Sick</span>
-            <span class="legend-item earned"><span class="color-box"></span> Earned</span>
+            <span class="legend-item paid"><span class="color-box"></span> Paid</span>
             <span class="legend-item unpaid"><span class="color-box"></span> Unpaid</span>
         </div>
     </div>
@@ -58,9 +56,7 @@
         border-radius: 3px;
     }
     
-    .legend-item.casual .color-box { background: #3498db; }
-    .legend-item.sick .color-box { background: #e74c3c; }
-    .legend-item.earned .color-box { background: #27ae60; }
+    .legend-item.paid .color-box { background: #3498db; }
     .legend-item.unpaid .color-box { background: #95a5a6; }
     
     #leave-calendar {
@@ -72,9 +68,7 @@
         padding: 2px 5px;
     }
     
-    .fc-event-casual { background-color: #3498db !important; border-color: #2980b9 !important; }
-    .fc-event-sick { background-color: #e74c3c !important; border-color: #c0392b !important; }
-    .fc-event-earned { background-color: #27ae60 !important; border-color: #1e8449 !important; }
+    .fc-event-paid { background-color: #3498db !important; border-color: #2980b9 !important; }
     .fc-event-unpaid { background-color: #95a5a6 !important; border-color: #7f8c8d !important; }
     
     .fc-event-pending {
@@ -132,10 +126,9 @@
                         var leaveTypeClass = '';
                         var leaveTypeName = '';
                         switch(leave.LeaveType) {
-                            case 1: leaveTypeClass = 'casual'; leaveTypeName = 'Casual'; break;
-                            case 2: leaveTypeClass = 'sick'; leaveTypeName = 'Sick'; break;
-                            case 3: leaveTypeClass = 'earned'; leaveTypeName = 'Earned'; break;
-                            case 4: leaveTypeClass = 'unpaid'; leaveTypeName = 'Unpaid'; break;
+                            case 1: leaveTypeClass = 'paid'; leaveTypeName = 'Paid'; break;
+                            case 2: leaveTypeClass = 'unpaid'; leaveTypeName = 'Unpaid'; break;
+                            default: leaveTypeClass = 'paid'; leaveTypeName = 'Paid'; break;
                         }
                         
                         var statusName = '';

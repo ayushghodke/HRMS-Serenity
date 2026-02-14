@@ -69,17 +69,51 @@ public class LeaveEndpoint : ServiceEndpoint
         var row = uow.Connection.TryFirst<MyRow>(MyRow.Fields.LeaveId == leaveId);
         if (row == null)
             throw new ValidationError("LeaveNotFound", "Leave request not found.");
-        
-        if (row.Status != LeaveStatus.Pending)
-            throw new ValidationError("InvalidStatus", "Only pending leaves can be approved.");
 
-        uow.Connection.UpdateById(new MyRow
+        if (row.FinalStatus == LeaveFinalStatus.Approved || row.FinalStatus == LeaveFinalStatus.Rejected || row.FinalStatus == LeaveFinalStatus.Cancelled)
+            throw new ValidationError("InvalidStatus", "This leave request is already finalized.");
+
+        if (row.FinalStatus == LeaveFinalStatus.Pending)
         {
-            LeaveId = leaveId,
-            Status = LeaveStatus.Approved,
-            ApprovedBy = userId,
-            ApprovedDate = DateTime.Now
-        });
+            uow.Connection.UpdateById(new MyRow
+            {
+                LeaveId = leaveId,
+                FinalStatus = LeaveFinalStatus.ManagerApproved,
+                Status = LeaveStatus.Pending
+            });
+
+            uow.Connection.Insert(new LeaveApprovalRow
+            {
+                LeaveId = leaveId,
+                ApproverId = userId,
+                ApprovalLevel = 1,
+                ApprovalDate = DateTime.Now,
+                Status = LeaveStatus.Approved,
+                TimeStamp = DateTime.Now
+            });
+        }
+        else
+        {
+            uow.Connection.UpdateById(new MyRow
+            {
+                LeaveId = leaveId,
+                Status = LeaveStatus.Approved,
+                HrApprovalStatus = Operations.HrApprovalStatus.Approved,
+                FinalStatus = LeaveFinalStatus.Approved,
+                ApprovedBy = userId,
+                ApprovedDate = DateTime.Now
+            });
+
+            uow.Connection.Insert(new LeaveApprovalRow
+            {
+                LeaveId = leaveId,
+                ApproverId = userId,
+                ApprovalLevel = 2,
+                ApprovalDate = DateTime.Now,
+                Status = LeaveStatus.Approved,
+                TimeStamp = DateTime.Now
+            });
+        }
 
         return new ServiceResponse();
     }
@@ -93,38 +127,28 @@ public class LeaveEndpoint : ServiceEndpoint
         var row = uow.Connection.TryFirst<MyRow>(MyRow.Fields.LeaveId == leaveId);
         if (row == null)
             throw new ValidationError("LeaveNotFound", "Leave request not found.");
-        
-        if (row.Status != LeaveStatus.Pending)
-            throw new ValidationError("InvalidStatus", "Only pending leaves can be rejected.");
 
-        // Restore leave balance
-        if (row.EmployeeId.HasValue && row.LeaveType.HasValue && row.TotalDays.HasValue)
-        {
-            var currentYear = DateTime.Now.Year;
-            var fld = LeaveBalanceRow.Fields;
-            
-            var balance = uow.Connection.TryFirst<LeaveBalanceRow>(
-                fld.EmployeeId == row.EmployeeId.Value & 
-                fld.LeaveType == (int)row.LeaveType.Value & 
-                fld.Year == currentYear);
-            
-            if (balance != null)
-            {
-                var newUsed = Math.Max(0, (balance.Used ?? 0) - (decimal)row.TotalDays.Value);
-                uow.Connection.UpdateById(new LeaveBalanceRow
-                {
-                    LeaveBalanceId = balance.LeaveBalanceId,
-                    Used = newUsed
-                });
-            }
-        }
+        if (row.FinalStatus == LeaveFinalStatus.Approved || row.FinalStatus == LeaveFinalStatus.Rejected || row.FinalStatus == LeaveFinalStatus.Cancelled)
+            throw new ValidationError("InvalidStatus", "This leave request is already finalized.");
 
         uow.Connection.UpdateById(new MyRow
         {
             LeaveId = leaveId,
             Status = LeaveStatus.Rejected,
+            HrApprovalStatus = Operations.HrApprovalStatus.Rejected,
+            FinalStatus = LeaveFinalStatus.Rejected,
             ApprovedBy = userId,
             ApprovedDate = DateTime.Now
+        });
+
+        uow.Connection.Insert(new LeaveApprovalRow
+        {
+            LeaveId = leaveId,
+            ApproverId = userId,
+            ApprovalLevel = row.FinalStatus == LeaveFinalStatus.ManagerApproved ? 2 : 1,
+            ApprovalDate = DateTime.Now,
+            Status = LeaveStatus.Rejected,
+            TimeStamp = DateTime.Now
         });
 
         return new ServiceResponse();

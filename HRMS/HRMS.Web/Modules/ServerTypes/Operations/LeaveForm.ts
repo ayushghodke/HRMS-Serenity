@@ -1,16 +1,30 @@
-﻿import { DateEditor, DecimalEditor, EnumEditor, initFormType, LookupEditor, PrefixedContext, TextAreaEditor } from "@serenity-is/corelib";
+﻿import { DateEditor, DecimalEditor, EnumEditor, ImageUploadEditor, initFormType, LookupEditor, PrefixedContext, StringEditor, TextAreaEditor } from "@serenity-is/corelib";
+import { HalfDaySession } from "./HalfDaySession";
+import { HrApprovalStatus } from "./HrApprovalStatus";
+import { LeaveFinalStatus } from "./LeaveFinalStatus";
 import { LeaveStatus } from "./LeaveStatus";
-import { LeaveType } from "./LeaveType";
 
 export interface LeaveForm {
+    LeaveApplicationNo: StringEditor;
+    ApplicationDate: DateEditor;
     EmployeeId: LookupEditor;
-    LeaveType: EnumEditor;
+    LeaveTypeId: LookupEditor;
     StartDate: DateEditor;
     EndDate: DateEditor;
+    HalfDaySession: EnumEditor;
     TotalDays: DecimalEditor;
+    PaidDays: DecimalEditor;
+    UnpaidDays: DecimalEditor;
     Reason: TextAreaEditor;
+    Attachment: ImageUploadEditor;
+    ReportingManagerId: LookupEditor;
     Status: EnumEditor;
-    ApprovedBy: LookupEditor;
+    HrApprovalStatus: EnumEditor;
+    FinalStatus: EnumEditor;
+    ManagerRemarks: TextAreaEditor;
+    HrRemarks: TextAreaEditor;
+    SubstituteEmployeeId: LookupEditor;
+    ContactDuringLeave: StringEditor;
 }
 
 export class LeaveForm extends PrefixedContext {
@@ -23,24 +37,38 @@ export class LeaveForm extends PrefixedContext {
         if (!LeaveForm.init) {
             LeaveForm.init = true;
 
-            var w0 = LookupEditor;
-            var w1 = EnumEditor;
-            var w2 = DateEditor;
-            var w3 = DecimalEditor;
-            var w4 = TextAreaEditor;
+            var w0 = StringEditor;
+            var w1 = DateEditor;
+            var w2 = LookupEditor;
+            var w3 = EnumEditor;
+            var w4 = DecimalEditor;
+            var w5 = TextAreaEditor;
+            var w6 = ImageUploadEditor;
 
             initFormType(LeaveForm, [
-                'EmployeeId', w0,
-                'LeaveType', w1,
-                'StartDate', w2,
-                'EndDate', w2,
-                'TotalDays', w3,
-                'Reason', w4,
-                'Status', w1,
-                'ApprovedBy', w0
+                'LeaveApplicationNo', w0,
+                'ApplicationDate', w1,
+                'EmployeeId', w2,
+                'LeaveTypeId', w2,
+                'StartDate', w1,
+                'EndDate', w1,
+                'HalfDaySession', w3,
+                'TotalDays', w4,
+                'PaidDays', w4,
+                'UnpaidDays', w4,
+                'Reason', w5,
+                'Attachment', w6,
+                'ReportingManagerId', w2,
+                'Status', w3,
+                'HrApprovalStatus', w3,
+                'FinalStatus', w3,
+                'ManagerRemarks', w5,
+                'HrRemarks', w5,
+                'SubstituteEmployeeId', w2,
+                'ContactDuringLeave', w0
             ]);
         }
     }
 }
 
-[LeaveType, LeaveStatus]; // referenced types
+[HalfDaySession, LeaveStatus, HrApprovalStatus, LeaveFinalStatus]; // referenced types

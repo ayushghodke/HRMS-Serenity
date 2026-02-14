@@ -1,6 +1,7 @@
 using Serenity.Data;
 using Serenity.Services;
 using System;
+using System.Collections.Generic;
 using MyRow = HRMS.Operations.LeaveRow;
 
 namespace HRMS.Operations;
@@ -17,105 +18,138 @@ public class LeaveSaveHandler : SaveRequestHandler<MyRow, SaveRequest<MyRow>, Sa
     {
         base.BeforeSave();
 
+        if (!Row.EmployeeId.HasValue)
+            throw new ValidationError("EmployeeRequired", "Employee is required.");
+
+        if (!Row.LeaveTypeId.HasValue)
+            throw new ValidationError("LeaveTypeRequired", "Leave type is required.");
+
+        if (!Row.StartDate.HasValue || !Row.EndDate.HasValue)
+            throw new ValidationError("DateRequired", "Start Date and End Date are required.");
+
+        var startDate = Row.StartDate.Value.Date;
+        var endDate = Row.EndDate.Value.Date;
+
+        if (endDate < startDate)
+            throw new ValidationError("InvalidDateRange", "End Date must be on or after Start Date.");
+
+        var totalDays = (decimal)(endDate - startDate).TotalDays + 1m;
+        if (Row.HalfDaySession.HasValue)
+            totalDays -= 0.5m;
+
+        if (totalDays <= 0)
+            throw new ValidationError("InvalidTotalDays", "Total days must be greater than zero.");
+
+        Row.TotalDays = (double)totalDays;
+
         if (IsCreate)
         {
             Row.CreatedDate = DateTime.Now;
-            
-            // Validate leave balance
-            if (Row.EmployeeId.HasValue && Row.LeaveType.HasValue && Row.TotalDays.HasValue)
-            {
-                // Only validate for Paid Leave
-                if (Row.LeaveType.Value == LeaveType.PaidLeave)
-                {
-                    var currentYear = DateTime.Now.Year;
-                    var fld = LeaveBalanceRow.Fields;
-                    
-                    var balance = Connection.TryFirst<LeaveBalanceRow>(
-                        fld.EmployeeId == Row.EmployeeId.Value & 
-                        fld.LeaveType == (int)Row.LeaveType.Value & 
-                        fld.Year == currentYear);
-                    
-                    // Calculate accrued leaves based on months worked
-                    var employeeFld = HR.EmployeeRow.Fields;
-                    var employee = Connection.TryById<HR.EmployeeRow>(Row.EmployeeId.Value);
-                    
-                    if (employee?.JoiningDate != null)
-                    {
-                        var monthsWorked = CalculateMonthsWorked(employee.JoiningDate.Value);
-                        var accruedLeaves = monthsWorked * 3m; // 3 leaves per month
-                        var usedLeaves = balance?.Used ?? 0m;
-                        var availableBalance = accruedLeaves - usedLeaves;
-                        
-                        if (availableBalance < (decimal)Row.TotalDays.Value)
-                        {
-                            throw new ValidationError("InsufficientBalance", 
-                                $"Insufficient leave balance. You have {availableBalance} paid leaves available (accrued: {accruedLeaves}, used: {usedLeaves}).");
-                        }
-                    }
-                }
-                // Unpaid leave - no validation needed
-            }
+            Row.ApplicationDate = DateTime.Now;
+            Row.LeaveApplicationNo = "LV-" + DateTime.Now.ToString("yyyyMMddHHmmss");
+            Row.Status = LeaveStatus.Pending;
+            Row.HrApprovalStatus = Operations.HrApprovalStatus.Pending;
+            Row.FinalStatus = Operations.LeaveFinalStatus.Pending;
+        }
+
+        var employee = Connection.TryById<HR.EmployeeRow>(Row.EmployeeId.Value)
+            ?? throw new ValidationError("EmployeeNotFound", "Employee not found.");
+
+        if (!Row.ReportingManagerId.HasValue)
+            Row.ReportingManagerId = employee.ManagerId;
+
+        var leaveType = Connection.TryById<LeaveTypeRow>(Row.LeaveTypeId.Value)
+            ?? throw new ValidationError("LeaveTypeNotFound", "Leave type not found.");
+
+        if (leaveType.DocumentsRequired == true && string.IsNullOrWhiteSpace(Row.Attachment))
+            throw new ValidationError("AttachmentRequired", "Attachment is required for this leave type.");
+
+        var monthlyQuota = (decimal)Math.Max(0, employee.PaidLeavesPerMonth ?? 2);
+        var consumedPaidByMonth = GetApprovedPaidUsageByMonth(Row.EmployeeId.Value, Row.LeaveId);
+
+        var requestDaysByMonth = new Dictionary<string, decimal>(StringComparer.Ordinal);
+        for (var day = startDate; day <= endDate; day = day.AddDays(1))
+        {
+            var key = GetMonthKey(day);
+            requestDaysByMonth.TryGetValue(key, out var current);
+            requestDaysByMonth[key] = current + 1m;
+        }
+
+        decimal paidDays = 0m;
+        decimal unpaidDays = 0m;
+
+        if (leaveType.LeaveCategory == LeaveCategory.Unpaid)
+        {
+            paidDays = 0m;
+            unpaidDays = totalDays;
+            Row.PaidDays = paidDays;
+            Row.UnpaidDays = unpaidDays;
+            Row.LeaveType = LeaveType.Unpaid;
+            return;
+        }
+
+        foreach (var monthItem in requestDaysByMonth)
+        {
+            consumedPaidByMonth.TryGetValue(monthItem.Key, out var alreadyConsumed);
+            var availablePaid = Math.Max(0m, monthlyQuota - alreadyConsumed);
+            var paidForMonth = Math.Min(monthItem.Value, availablePaid);
+            var unpaidForMonth = monthItem.Value - paidForMonth;
+
+            paidDays += paidForMonth;
+            unpaidDays += unpaidForMonth;
+        }
+
+        Row.PaidDays = paidDays;
+        Row.UnpaidDays = unpaidDays;
+        Row.LeaveType = unpaidDays > 0 ? LeaveType.Unpaid : LeaveType.PaidLeave;
+    }
+
+    private Dictionary<string, decimal> GetApprovedPaidUsageByMonth(int employeeId, int? excludeLeaveId)
+    {
+        var fld = MyRow.Fields;
+        var approvedLeaves = Connection.List<MyRow>(
+            fld.EmployeeId == employeeId & fld.Status == (int)LeaveStatus.Approved);
+
+        var usage = new Dictionary<string, decimal>(StringComparer.Ordinal);
+
+        foreach (var leave in approvedLeaves)
+        {
+            if (excludeLeaveId.HasValue && leave.LeaveId == excludeLeaveId.Value)
+                continue;
+
+            if (!leave.StartDate.HasValue || !leave.EndDate.HasValue)
+                continue;
+
+            var total = (decimal)(leave.TotalDays ?? 0);
+            if (total <= 0)
+                continue;
+
+            var paid = leave.PaidDays ?? (leave.LeaveType == LeaveType.PaidLeave ? total : 0m);
+            if (paid <= 0)
+                continue;
+
+            AddPaidUsageByMonth(usage, leave.StartDate.Value.Date, leave.EndDate.Value.Date, paid);
+        }
+
+        return usage;
+    }
+
+    private static void AddPaidUsageByMonth(Dictionary<string, decimal> usage, DateTime startDate, DateTime endDate, decimal paidDays)
+    {
+        var remainingPaid = paidDays;
+
+        for (var day = startDate; day <= endDate && remainingPaid > 0m; day = day.AddDays(1))
+        {
+            var key = GetMonthKey(day);
+            var allocate = Math.Min(1m, remainingPaid);
+            usage.TryGetValue(key, out var current);
+            usage[key] = current + allocate;
+            remainingPaid -= allocate;
         }
     }
 
-    protected override void AfterSave()
+    private static string GetMonthKey(DateTime date)
     {
-        base.AfterSave();
-
-        // Update leave balance when a new leave is created
-        if (IsCreate && Row.EmployeeId.HasValue && Row.LeaveType.HasValue && Row.TotalDays.HasValue)
-        {
-            UpdateLeaveBalance(Row.EmployeeId.Value, Row.LeaveType.Value, (decimal)Row.TotalDays.Value);
-        }
-    }
-
-    private void UpdateLeaveBalance(int employeeId, LeaveType leaveType, decimal days)
-    {
-        var currentYear = DateTime.Now.Year;
-        var fld = LeaveBalanceRow.Fields;
-
-        // Find the existing balance record
-        var balance = Connection.TryFirst<LeaveBalanceRow>(
-            fld.EmployeeId == employeeId & 
-            fld.LeaveType == (int)leaveType & 
-            fld.Year == currentYear);
-
-        if (balance != null)
-        {
-            // Update the Used field
-            var newUsed = (balance.Used ?? 0) + days;
-            Connection.UpdateById(new LeaveBalanceRow
-            {
-                LeaveBalanceId = balance.LeaveBalanceId,
-                Used = newUsed
-            });
-        }
-        else
-        {
-            // Create new balance record if doesn't exist
-            // For Paid Leave: 3 leaves/month × 12 months = 36 leaves/year
-            var defaultAllocated = leaveType == LeaveType.PaidLeave ? 36m : 0m;
-
-            Connection.Insert(new LeaveBalanceRow
-            {
-                EmployeeId = employeeId,
-                LeaveType = leaveType,
-                Year = currentYear,
-                Allocated = defaultAllocated,
-                Used = days
-            });
-        }
-    }
-    
-    private int CalculateMonthsWorked(DateTime joinDate)
-    {
-        var today = DateTime.Now;
-        var months = ((today.Year - joinDate.Year) * 12) + today.Month - joinDate.Month;
-        
-        // Add 1 if the employee joined before the current day of the month
-        if (today.Day >= joinDate.Day)
-            months++;
-            
-        return Math.Max(0, months);
+        return $"{date.Year:D4}-{date.Month:D2}";
     }
 }

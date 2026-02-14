@@ -15,6 +15,7 @@ public class EmployeeColumns
     public string FullName { get; set; }
     public string Email { get; set; }
     public string Phone { get; set; }
+    public int PaidLeavesPerMonth { get; set; }
     public string DepartmentName { get; set; }
     public string DesignationName { get; set; }
     [Width(100), AlignCenter]

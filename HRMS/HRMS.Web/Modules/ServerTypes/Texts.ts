@@ -147,6 +147,7 @@ namespace texts {
                 export const LastName: string;
                 export const ManagerFullName: string;
                 export const ManagerId: string;
+                export const PaidLeavesPerMonth: string;
                 export const Phone: string;
                 export const Status: string;
                 export const UserId: string;
@@ -236,24 +237,98 @@ namespace texts {
                 export const Type: string;
                 export const UserId: string;
             }
+            namespace EmployeeLeaveProfile {
+                export function asKey(): typeof EmployeeLeaveProfile;
+                export function asTry(): typeof EmployeeLeaveProfile;
+                export const AccruedLeave: string;
+                export const CarryForwardLeave: string;
+                export const DepartmentName: string;
+                export const DesignationName: string;
+                export const EmployeeFullName: string;
+                export const EmployeeId: string;
+                export const EmployeeLeaveProfileId: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const LOPDays: string;
+                export const LastUpdatedDate: string;
+                export const LeavePolicyId: string;
+                export const LeavePolicyName: string;
+                export const LeaveTypeId: string;
+                export const LeaveTypeName: string;
+                export const OpeningBalance: string;
+                export const PendingLeave: string;
+                export const UsedLeave: string;
+            }
+            namespace Holiday {
+                export function asKey(): typeof Holiday;
+                export function asTry(): typeof Holiday;
+                export const ApplicableDepartments: string;
+                export const Branch: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const HolidayDate: string;
+                export const HolidayId: string;
+                export const HolidayName: string;
+                export const HolidayType: string;
+                export const IsOptionalHoliday: string;
+                export const Year: string;
+            }
             namespace Leave {
                 export function asKey(): typeof Leave;
                 export function asTry(): typeof Leave;
+                export const ApplicationDate: string;
                 export const ApprovedBy: string;
                 export const ApprovedByUsername: string;
                 export const ApprovedDate: string;
+                export const Attachment: string;
+                export const ContactDuringLeave: string;
+                export const CreatedByUserId: string;
+                export const CreatedByUsername: string;
                 export const CreatedDate: string;
                 export const EmployeeFullName: string;
                 export const EmployeeId: string;
                 export const EndDate: string;
                 export const EntityPlural: string;
                 export const EntitySingular: string;
+                export const FinalStatus: string;
+                export const HalfDaySession: string;
+                export const HrApprovalStatus: string;
+                export const HrRemarks: string;
+                export const LeaveApplicationNo: string;
                 export const LeaveId: string;
                 export const LeaveType: string;
+                export const LeaveTypeId: string;
+                export const LeaveTypeName: string;
+                export const ManagerRemarks: string;
+                export const PaidDays: string;
                 export const Reason: string;
+                export const ReportingManagerId: string;
+                export const ReportingManagerName: string;
                 export const StartDate: string;
                 export const Status: string;
+                export const SubstituteEmployeeId: string;
+                export const SubstituteEmployeeName: string;
                 export const TotalDays: string;
+                export const UnpaidDays: string;
+            }
+            namespace LeaveApproval {
+                export function asKey(): typeof LeaveApproval;
+                export function asTry(): typeof LeaveApproval;
+                export const ApprovalDate: string;
+                export const ApprovalId: string;
+                export const ApprovalLevel: string;
+                export const ApproverId: string;
+                export const ApproverUsername: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const EscalationTo: string;
+                export const EscalationToUsername: string;
+                export const EscalationTrigger: string;
+                export const LeaveApplicationNo: string;
+                export const LeaveId: string;
+                export const Remarks: string;
+                export const Status: string;
+                export const TimeStamp: string;
             }
             namespace LeaveBalance {
                 export function asKey(): typeof LeaveBalance;
@@ -264,6 +339,7 @@ namespace texts {
                 export const EmployeeFullName: string;
                 export const EmployeeId: string;
                 export const EmployeeJoinDate: string;
+                export const EmployeePaidLeavesPerMonth: string;
                 export const EntityPlural: string;
                 export const EntitySingular: string;
                 export const LeaveBalanceId: string;
@@ -274,6 +350,51 @@ namespace texts {
                 export const RemainingLeaves: string;
                 export const Used: string;
                 export const Year: string;
+            }
+            namespace LeavePolicy {
+                export function asKey(): typeof LeavePolicy;
+                export function asTry(): typeof LeavePolicy;
+                export const ApplicableFromDate: string;
+                export const ApprovalLevels: string;
+                export const Branch: string;
+                export const DepartmentId: string;
+                export const DepartmentName: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const HROverridePermission: string;
+                export const LeavePolicyId: string;
+                export const MaxConsecutiveLeavesAllowed: string;
+                export const NoticePeriodLeaveAllowed: string;
+                export const PayrollCutoffDay: string;
+                export const PolicyName: string;
+                export const ProbationLeaveAllowed: string;
+                export const Status: string;
+            }
+            namespace LeaveType {
+                export function asKey(): typeof LeaveType;
+                export function asTry(): typeof LeaveType;
+                export const AnnualAllocation: string;
+                export const ApplicableBranches: string;
+                export const ApplicableDepartments: string;
+                export const ApplicableDesignations: string;
+                export const CarryForwardAllowed: string;
+                export const DocumentsRequired: string;
+                export const EncashmentAllowed: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const GenderSpecific: string;
+                export const HalfDayAllowed: string;
+                export const LeaveCategory: string;
+                export const LeaveCode: string;
+                export const LeaveTypeId: string;
+                export const LeaveTypeName: string;
+                export const MaxCarryForwardDays: string;
+                export const MaxLeavePerRequest: string;
+                export const MinimumServiceRequiredMonths: string;
+                export const MonthlyAccrual: string;
+                export const ProbationApplicable: string;
+                export const SandwichRuleApplicable: string;
+                export const Status: string;
             }
             namespace Payroll {
                 export function asKey(): typeof Payroll;
@@ -511,8 +632,13 @@ const Texts: typeof texts = proxyTexts({}, '', {
         Operations: {
             Assets: {},
             Attendance: {},
+            EmployeeLeaveProfile: {},
+            Holiday: {},
             Leave: {},
+            LeaveApproval: {},
             LeaveBalance: {},
+            LeavePolicy: {},
+            LeaveType: {},
             Payroll: {},
             SalaryComponents: {},
             SalaryGrade: {},

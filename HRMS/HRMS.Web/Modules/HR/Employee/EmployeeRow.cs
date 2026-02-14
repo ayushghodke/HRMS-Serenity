@@ -52,6 +52,9 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
     [DisplayName("Joining Date")]
     public DateTime? JoiningDate { get => fields.JoiningDate[this]; set => fields.JoiningDate[this] = value; }
 
+    [DisplayName("Paid Leaves / Month"), NotNull, DefaultValue(2)]
+    public int? PaidLeavesPerMonth { get => fields.PaidLeavesPerMonth[this]; set => fields.PaidLeavesPerMonth[this] = value; }
+
     [DisplayName("Department"), ForeignKey(typeof(DepartmentRow)), LeftJoin(jDepartment), TextualField(nameof(DepartmentName))]
     [LookupEditor(typeof(DepartmentRow), Async = true)]
     public int? DepartmentId { get => fields.DepartmentId[this]; set => fields.DepartmentId[this] = value; }
@@ -101,6 +104,7 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
         public Int32Field Gender;
         public DateTimeField DateOfBirth;
         public DateTimeField JoiningDate;
+        public Int32Field PaidLeavesPerMonth;
         public Int32Field DepartmentId;
         public Int32Field DesignationId;
         public Int32Field ManagerId;

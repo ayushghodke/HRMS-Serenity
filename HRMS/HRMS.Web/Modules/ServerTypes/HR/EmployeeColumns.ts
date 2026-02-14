@@ -9,6 +9,7 @@ export interface EmployeeColumns {
     FullName: Column<EmployeeRow>;
     Email: Column<EmployeeRow>;
     Phone: Column<EmployeeRow>;
+    PaidLeavesPerMonth: Column<EmployeeRow>;
     DepartmentName: Column<EmployeeRow>;
     DesignationName: Column<EmployeeRow>;
     Status: Column<EmployeeRow>;
