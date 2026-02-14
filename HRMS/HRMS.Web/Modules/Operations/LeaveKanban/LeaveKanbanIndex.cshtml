@@ -1,0 +1,397 @@
+@using Serenity
+@using Serenity.Web
+@{
+    ViewData["Title"] = "Leave Workflow Kanban";
+}
+
+<div id="leave-kanban-container">
+    <div class="kanban-header">
+        <h2><i class="fa fa-trello"></i> Leave Workflow Board</h2>
+        <button id="refresh-kanban" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>
+    </div>
+
+    <div class="kanban-board">
+        <div class="kanban-column" data-status="0">
+            <div class="column-header pending">
+                <h3>🟡 Pending</h3>
+                <span class="count" id="count-0">0</span>
+            </div>
+            <div class="column-content sortable" id="column-0"></div>
+        </div>
+
+        <div class="kanban-column" data-status="1">
+            <div class="column-header manager-approved">
+                <h3>🟠 Manager Approved</h3>
+                <span class="count" id="count-1">0</span>
+            </div>
+            <div class="column-content sortable" id="column-1"></div>
+        </div>
+
+        <div class="kanban-column" data-status="2">
+            <div class="column-header approved">
+                <h3>🟢 Final Approved</h3>
+                <span class="count" id="count-2">0</span>
+            </div>
+            <div class="column-content sortable" id="column-2"></div>
+        </div>
+
+        <div class="kanban-column" data-status="-1">
+            <div class="column-header rejected">
+                <h3>🔴 Rejected</h3>
+                <span class="count" id="count--1">0</span>
+            </div>
+            <div class="column-content sortable" id="column--1"></div>
+        </div>
+
+        <div class="kanban-column" data-status="-2">
+            <div class="column-header cancelled">
+                <h3>⚫ Cancelled</h3>
+                <span class="count" id="count--2">0</span>
+            </div>
+            <div class="column-content sortable" id="column--2"></div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #leave-kanban-container {
+        padding: 20px;
+        background: #f4f6f9;
+        min-height: calc(100vh - 100px);
+    }
+
+    .kanban-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .kanban-header h2 {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .kanban-board {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .kanban-column {
+        min-width: 260px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 180px);
+    }
+
+    .column-header {
+        padding: 14px;
+        border-radius: 8px 8px 0 0;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .column-header h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .column-header .count {
+        background: rgba(255, 255, 255, 0.28);
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 12px;
+    }
+
+    .column-header.pending { background: #f39c12; }
+    .column-header.manager-approved { background: #e67e22; }
+    .column-header.approved { background: #27ae60; }
+    .column-header.rejected { background: #e74c3c; }
+    .column-header.cancelled { background: #7f8c8d; }
+
+    .column-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        min-height: 220px;
+    }
+
+    .leave-card {
+        background: #fff;
+        border: 1px solid #dfe4ea;
+        border-left: 4px solid #3498db;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 10px;
+        cursor: move;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        transition: all 0.2s ease;
+    }
+
+    .leave-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .leave-card.dragging {
+        opacity: 0.5;
+    }
+
+    .leave-app {
+        font-weight: 700;
+        color: #1f2d3d;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .leave-emp {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 6px;
+    }
+
+    .leave-meta {
+        font-size: 12px;
+        color: #606f7b;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .leave-badges {
+        margin-top: 8px;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .leave-badge {
+        font-size: 11px;
+        border-radius: 10px;
+        padding: 3px 8px;
+        background: #eef2f7;
+        color: #3b4a5a;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #b0b8c2;
+        padding: 36px 16px;
+        font-style: italic;
+    }
+
+    @@media (max-width: 1500px) {
+        .kanban-board { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    @@media (max-width: 1000px) {
+        .kanban-board { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @@media (max-width: 700px) {
+        .kanban-board { grid-template-columns: 1fr; }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@@latest/Sortable.min.js"></script>
+
+<script type="text/javascript">
+    var leaveItems = [];
+    var leaveSyncKey = 'hrms:leave-workflow-changed';
+    var statuses = [0, 1, 2, -1, -2];
+
+    function normalizeFinalStatus(item) {
+        if (item.FinalStatus !== null && item.FinalStatus !== undefined)
+            return item.FinalStatus;
+
+        if (item.Status === 1)
+            return 2;
+        if (item.Status === -1)
+            return -1;
+        if (item.Status === -2)
+            return -2;
+
+        return 0;
+    }
+
+    function loadLeaves() {
+        Q.serviceRequest('Operations/Leave/List', {}, function (response) {
+            leaveItems = response.Entities || [];
+            renderKanban();
+        });
+    }
+
+    function renderKanban() {
+        statuses.forEach(function (s) {
+            var col = document.getElementById('column-' + s);
+            var cnt = document.getElementById('count-' + s);
+            if (col) col.innerHTML = '';
+            if (cnt) cnt.textContent = '0';
+        });
+
+        var grouped = {};
+        leaveItems.forEach(function (item) {
+            var status = normalizeFinalStatus(item);
+            if (!grouped[status]) grouped[status] = [];
+            grouped[status].push(item);
+        });
+
+        Object.keys(grouped).forEach(function (statusKey) {
+            var status = parseInt(statusKey, 10);
+            var col = document.getElementById('column-' + status);
+            var cnt = document.getElementById('count-' + status);
+            if (!col) return;
+
+            var items = grouped[status] || [];
+            if (cnt) cnt.textContent = items.length.toString();
+
+            items.forEach(function (item) {
+                col.appendChild(createLeaveCard(item, status));
+            });
+        });
+
+        statuses.forEach(function (s) {
+            var col = document.getElementById('column-' + s);
+            if (col && col.children.length === 0) {
+                var empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.textContent = 'No leave requests';
+                col.appendChild(empty);
+            }
+        });
+    }
+
+    function createLeaveCard(item, status) {
+        var card = document.createElement('div');
+        card.className = 'leave-card';
+        card.setAttribute('data-id', item.LeaveId);
+        card.setAttribute('data-status', status);
+
+        var startDate = item.StartDate ? new Date(item.StartDate).toLocaleDateString('en-IN') : '-';
+        var endDate = item.EndDate ? new Date(item.EndDate).toLocaleDateString('en-IN') : '-';
+
+        card.innerHTML =
+            '<div class="leave-app">' + (item.LeaveApplicationNo || ('Leave #' + item.LeaveId)) + '</div>' +
+            '<div class="leave-emp"><i class="fa fa-user"></i> ' + (item.EmployeeFullName || 'Unknown Employee') + '</div>' +
+            '<div class="leave-meta"><i class="fa fa-tag"></i> ' + (item.LeaveTypeName || 'Leave') + '</div>' +
+            '<div class="leave-meta"><i class="fa fa-calendar"></i> ' + startDate + ' - ' + endDate + '</div>' +
+            '<div class="leave-meta"><i class="fa fa-sitemap"></i> ' + (item.ReportingManagerName || 'No Manager') + '</div>' +
+            '<div class="leave-badges">' +
+                '<span class="leave-badge">Total: ' + (item.TotalDays || 0) + '</span>' +
+                '<span class="leave-badge">Paid: ' + (item.PaidDays || 0) + '</span>' +
+                '<span class="leave-badge">Unpaid: ' + (item.UnpaidDays || 0) + '</span>' +
+            '</div>';
+
+        card.addEventListener('click', function () {
+            window.location.href = Q.resolveUrl('~/Operations/Leave#edit/' + item.LeaveId);
+        });
+
+        return card;
+    }
+
+    function isTransitionAllowed(fromStatus, toStatus) {
+        if (fromStatus === toStatus)
+            return false;
+
+        if (fromStatus === 0)
+            return toStatus === 1 || toStatus === -1 || toStatus === -2;
+
+        if (fromStatus === 1)
+            return toStatus === 2 || toStatus === -1 || toStatus === -2;
+
+        return false;
+    }
+
+    function callTransition(leaveId, toStatus) {
+        var endpoint = null;
+        if (toStatus === 1 || toStatus === 2)
+            endpoint = 'Operations/Leave/Approve';
+        else if (toStatus === -1)
+            endpoint = 'Operations/Leave/Reject';
+        else if (toStatus === -2)
+            endpoint = 'Operations/Leave/Cancel';
+
+        if (!endpoint) {
+            Q.notifyError('Unsupported transition');
+            loadLeaves();
+            return;
+        }
+
+        Q.serviceRequest(endpoint, leaveId, function () {
+            Q.notifySuccess('Leave workflow updated successfully.');
+            notifyLeaveWorkflowChanged();
+            loadLeaves();
+        }, {
+            onError: function (response) {
+                Q.notifyError((response && response.Error && response.Error.Message) || 'Failed to update leave status.');
+                loadLeaves();
+            }
+        });
+    }
+
+    function notifyLeaveWorkflowChanged() {
+        window.dispatchEvent(new Event('leave-workflow-changed'));
+        try {
+            window.localStorage.setItem(leaveSyncKey, new Date().toISOString());
+        } catch (e) {
+        }
+    }
+
+    function setupAutoRefreshSync() {
+        window.addEventListener('leave-workflow-changed', function () {
+            loadLeaves();
+        });
+
+        window.addEventListener('storage', function (event) {
+            if (event.key === leaveSyncKey)
+                loadLeaves();
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        setupAutoRefreshSync();
+        loadLeaves();
+
+        document.querySelectorAll('.sortable').forEach(function (column) {
+            new Sortable(column, {
+                group: 'leave-kanban',
+                animation: 150,
+                ghostClass: 'dragging',
+                onEnd: function (evt) {
+                    if (evt.from === evt.to)
+                        return;
+
+                    var leaveId = parseInt(evt.item.getAttribute('data-id') || '0', 10);
+                    var fromStatus = parseInt(evt.from.parentElement.getAttribute('data-status') || '0', 10);
+                    var toStatus = parseInt(evt.to.parentElement.getAttribute('data-status') || '0', 10);
+
+                    if (!isTransitionAllowed(fromStatus, toStatus)) {
+                        Q.notifyError('Transition is not allowed for this leave stage.');
+                        loadLeaves();
+                        return;
+                    }
+
+                    callTransition(leaveId, toStatus);
+                }
+            });
+        });
+
+        document.getElementById('refresh-kanban').addEventListener('click', function () {
+            loadLeaves();
+        });
+    });
+</script>

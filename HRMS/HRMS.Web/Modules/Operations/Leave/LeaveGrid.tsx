@@ -1,4 +1,4 @@
-import { EntityGrid, Decorators, ToolButton, confirmDialog, notifySuccess, notifyError, serviceCall } from '@serenity-is/corelib';
+import { EntityGrid, Decorators, ToolButton, confirmDialog, notifySuccess, notifyError, resolveUrl, serviceCall } from '@serenity-is/corelib';
 import { LeaveColumns, LeaveRow, LeaveService, LeaveStatus } from '../../ServerTypes/Operations';
 import { LeaveDialog } from './LeaveDialog';
 import { Column, FormatterContext } from '@serenity-is/sleekgrid';
@@ -9,6 +9,39 @@ export class LeaveGrid extends EntityGrid<LeaveRow> {
     protected override getDialogType() { return LeaveDialog; }
     protected override getRowDefinition() { return LeaveRow; }
     protected override getService() { return LeaveService.baseUrl; }
+
+    protected override getButtons(): ToolButton[] {
+        const buttons = super.getButtons();
+
+        buttons.push({
+            title: 'Kanban View',
+            cssClass: 'btn-info',
+            icon: 'fa-trello',
+            onClick: () => {
+                window.location.href = resolveUrl('~/Operations/LeaveKanban');
+            }
+        });
+
+        buttons.push({
+            title: 'Dashboard',
+            cssClass: 'btn-primary',
+            icon: 'fa-area-chart',
+            onClick: () => {
+                window.location.href = resolveUrl('~/Operations/LeaveDashboard');
+            }
+        });
+
+        buttons.push({
+            title: 'Reports',
+            cssClass: 'btn-default',
+            icon: 'fa-file-text-o',
+            onClick: () => {
+                window.location.href = resolveUrl('~/Operations/LeaveReports');
+            }
+        });
+
+        return buttons;
+    }
 
     protected override getColumns(): Column[] {
         let columns = super.getColumns();

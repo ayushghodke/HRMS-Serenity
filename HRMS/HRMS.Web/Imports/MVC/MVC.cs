@@ -46,6 +46,21 @@ public static partial class Views
             public const string LeaveCalendarIndex = "~/Modules/Operations/LeaveCalendar/LeaveCalendarIndex.cshtml";
         }
 
+        public static partial class LeaveDashboard
+        {
+            public const string LeaveDashboardIndex = "~/Modules/Operations/LeaveDashboard/LeaveDashboardIndex.cshtml";
+        }
+
+        public static partial class LeaveKanban
+        {
+            public const string LeaveKanbanIndex = "~/Modules/Operations/LeaveKanban/LeaveKanbanIndex.cshtml";
+        }
+
+        public static partial class LeaveReports
+        {
+            public const string LeaveReportsIndex = "~/Modules/Operations/LeaveReports/LeaveReportsIndex.cshtml";
+        }
+
         public static partial class Task
         {
             public const string TaskKanbanIndex = "~/Modules/Operations/Task/TaskKanbanIndex.cshtml";

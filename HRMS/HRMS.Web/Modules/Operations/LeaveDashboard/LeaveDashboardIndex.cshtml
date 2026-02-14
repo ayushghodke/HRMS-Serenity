@@ -1,0 +1,111 @@
+@using Serenity
+@using Serenity.Web
+@{
+    ViewData["Title"] = "Leave Dashboard";
+}
+
+<div class="leave-dashboard-container">
+    <div class="leave-dash-header">
+        <h2><i class="fa fa-line-chart"></i> Leave Analytics Dashboard</h2>
+        <div>
+            <button id="refresh-leave-dashboard" class="btn btn-default"><i class="fa fa-refresh"></i> Refresh</button>
+        </div>
+    </div>
+
+    <div class="leave-filters">
+        <input type="number" id="filter-department" class="form-control" placeholder="Department Id" />
+        <input type="number" id="filter-employee" class="form-control" placeholder="Employee Id" />
+        <input type="number" id="filter-leavetype" class="form-control" placeholder="Leave Type Id" />
+        <button id="apply-leave-filters" class="btn btn-primary">Apply Filters</button>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card"><span>Total Allocated</span><strong id="kpi-total-allocated">0</strong></div>
+        <div class="kpi-card"><span>Leave Taken</span><strong id="kpi-leave-taken">0</strong></div>
+        <div class="kpi-card"><span>Pending Approval</span><strong id="kpi-pending">0</strong></div>
+        <div class="kpi-card"><span>Remaining Balance</span><strong id="kpi-remaining">0</strong></div>
+        <div class="kpi-card"><span>LOP Days</span><strong id="kpi-lop">0</strong></div>
+        <div class="kpi-card"><span>Upcoming Leaves</span><strong id="kpi-upcoming">0</strong></div>
+        <div class="kpi-card"><span>On Leave Today</span><strong id="kpi-onleave">0</strong></div>
+    </div>
+
+    <div class="chart-card">
+        <h4>Monthly Leave Trend (Approved)</h4>
+        <canvas id="leave-trend-chart" height="110"></canvas>
+    </div>
+</div>
+
+<style>
+    .leave-dashboard-container { padding: 20px; }
+    .leave-dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .leave-filters { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)) auto; gap: 10px; margin-bottom: 16px; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+    .kpi-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .kpi-card span { color: #6b7280; font-size: 12px; }
+    .kpi-card strong { color: #111827; font-size: 22px; }
+    .chart-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; }
+    @@media (max-width: 1000px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } .leave-filters { grid-template-columns: 1fr 1fr; } }
+    @@media (max-width: 600px) { .kpi-grid { grid-template-columns: 1fr; } .leave-filters { grid-template-columns: 1fr; } }
+</style>
+
+<script nonce="@Html.CspNonce()">
+    let leaveTrendChart = null;
+
+    function getRequest() {
+        return {
+            DepartmentId: parseInt(document.getElementById('filter-department').value || '', 10) || null,
+            EmployeeId: parseInt(document.getElementById('filter-employee').value || '', 10) || null,
+            LeaveTypeId: parseInt(document.getElementById('filter-leavetype').value || '', 10) || null
+        };
+    }
+
+    function loadLeaveDashboard() {
+        const req = getRequest();
+
+        Q.serviceRequest('Operations/LeaveDashboard/GetStats', req, function (res) {
+            document.getElementById('kpi-total-allocated').textContent = (res.TotalAllocated || 0).toFixed(2);
+            document.getElementById('kpi-leave-taken').textContent = (res.LeaveTaken || 0).toFixed(2);
+            document.getElementById('kpi-pending').textContent = (res.PendingApproval || 0).toFixed(2);
+            document.getElementById('kpi-remaining').textContent = (res.RemainingBalance || 0).toFixed(2);
+            document.getElementById('kpi-lop').textContent = (res.LOPDays || 0).toFixed(2);
+            document.getElementById('kpi-upcoming').textContent = (res.UpcomingLeaves || 0).toString();
+            document.getElementById('kpi-onleave').textContent = (res.EmployeesOnLeaveToday || 0).toString();
+        });
+
+        Q.serviceRequest('Operations/LeaveDashboard/GetMonthlyTrend', req, function (res) {
+            renderTrendChart(res.Labels || [], res.Values || []);
+        });
+    }
+
+    function renderTrendChart(labels, values) {
+        const ctx = document.getElementById('leave-trend-chart');
+        if (!ctx) return;
+
+        if (leaveTrendChart) {
+            leaveTrendChart.destroy();
+        }
+
+        leaveTrendChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Approved Leave Days',
+                    data: values,
+                    backgroundColor: '#2563eb'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadLeaveDashboard();
+        document.getElementById('refresh-leave-dashboard').addEventListener('click', loadLeaveDashboard);
+        document.getElementById('apply-leave-filters').addEventListener('click', loadLeaveDashboard);
+    });
+</script>

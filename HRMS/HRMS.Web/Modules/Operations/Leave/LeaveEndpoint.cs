@@ -153,4 +153,39 @@ public class LeaveEndpoint : ServiceEndpoint
 
         return new ServiceResponse();
     }
+
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public ServiceResponse Cancel(IUnitOfWork uow, [FromBody] int leaveId,
+        [FromServices] IUserAccessor userAccessor)
+    {
+        var userId = int.Parse(userAccessor.User?.GetIdentifier() ?? "0");
+
+        var row = uow.Connection.TryFirst<MyRow>(MyRow.Fields.LeaveId == leaveId);
+        if (row == null)
+            throw new ValidationError("LeaveNotFound", "Leave request not found.");
+
+        if (row.FinalStatus == LeaveFinalStatus.Approved || row.FinalStatus == LeaveFinalStatus.Rejected || row.FinalStatus == LeaveFinalStatus.Cancelled)
+            throw new ValidationError("InvalidStatus", "This leave request is already finalized.");
+
+        uow.Connection.UpdateById(new MyRow
+        {
+            LeaveId = leaveId,
+            Status = LeaveStatus.Cancelled,
+            FinalStatus = LeaveFinalStatus.Cancelled,
+            ApprovedBy = userId,
+            ApprovedDate = DateTime.Now
+        });
+
+        uow.Connection.Insert(new LeaveApprovalRow
+        {
+            LeaveId = leaveId,
+            ApproverId = userId,
+            ApprovalLevel = row.FinalStatus == LeaveFinalStatus.ManagerApproved ? 2 : 1,
+            ApprovalDate = DateTime.Now,
+            Status = LeaveStatus.Cancelled,
+            TimeStamp = DateTime.Now
+        });
+
+        return new ServiceResponse();
+    }
 }

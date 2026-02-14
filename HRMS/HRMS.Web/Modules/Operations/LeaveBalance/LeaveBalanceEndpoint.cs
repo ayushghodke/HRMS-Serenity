@@ -163,4 +163,77 @@ public class LeaveBalanceEndpoint : ServiceEndpoint
         
         return handler.List(connection, request);
     }
+
+    [HttpPost, AuthorizeUpdate(typeof(MyRow))]
+    public ServiceResponse RunYearEndProcessing(IUnitOfWork uow, YearEndProcessingRequest request)
+    {
+        var sourceYear = request.Year <= 0 ? DateTime.Now.Year : request.Year;
+        var nextYear = sourceYear + 1;
+        var carried = 0;
+
+        var sql = @"
+            SELECT
+                lp.EmployeeId,
+                lp.LeaveTypeId,
+                ISNULL(lp.OpeningBalance, 0) AS OpeningBalance,
+                ISNULL(lp.AccruedLeave, 0) AS AccruedLeave,
+                ISNULL(lp.UsedLeave, 0) AS UsedLeave,
+                ISNULL(lp.CarryForwardLeave, 0) AS CarryForwardLeave,
+                ISNULL(lt.CarryForwardAllowed, 0) AS CarryForwardAllowed,
+                ISNULL(lt.MaxCarryForwardDays, 0) AS MaxCarryForwardDays,
+                ISNULL(lt.EncashmentAllowed, 0) AS EncashmentAllowed,
+                ISNULL(lt.AnnualAllocation, 0) AS AnnualAllocation
+            FROM EmployeeLeaveProfiles lp
+            INNER JOIN LeaveTypes lt ON lt.LeaveTypeId = lp.LeaveTypeId
+        ";
+
+        var rows = uow.Connection.Query<YearEndCarryForwardRow>(sql).ToList();
+        foreach (var row in rows)
+        {
+            var remaining = Math.Max(0m, row.OpeningBalance + row.AccruedLeave + row.CarryForwardLeave - row.UsedLeave);
+            var carryForward = row.CarryForwardAllowed ? Math.Min(remaining, row.MaxCarryForwardDays) : 0m;
+
+            var existingNext = uow.Connection.TryFirst<Operations.EmployeeLeaveProfileRow>(
+                Operations.EmployeeLeaveProfileRow.Fields.EmployeeId == row.EmployeeId &
+                Operations.EmployeeLeaveProfileRow.Fields.LeaveTypeId == row.LeaveTypeId);
+
+            if (existingNext != null)
+            {
+                uow.Connection.UpdateById(new Operations.EmployeeLeaveProfileRow
+                {
+                    EmployeeLeaveProfileId = existingNext.EmployeeLeaveProfileId,
+                    OpeningBalance = row.AnnualAllocation,
+                    AccruedLeave = 0,
+                    UsedLeave = 0,
+                    PendingLeave = 0,
+                    CarryForwardLeave = carryForward,
+                    LOPDays = 0,
+                    LastUpdatedDate = DateTime.Now
+                });
+            }
+
+            carried++;
+        }
+
+        return new ServiceResponse();
+    }
+}
+
+public class YearEndProcessingRequest : ServiceRequest
+{
+    public int Year { get; set; }
+}
+
+public class YearEndCarryForwardRow
+{
+    public int EmployeeId { get; set; }
+    public int LeaveTypeId { get; set; }
+    public decimal OpeningBalance { get; set; }
+    public decimal AccruedLeave { get; set; }
+    public decimal UsedLeave { get; set; }
+    public decimal CarryForwardLeave { get; set; }
+    public bool CarryForwardAllowed { get; set; }
+    public decimal MaxCarryForwardDays { get; set; }
+    public bool EncashmentAllowed { get; set; }
+    public decimal AnnualAllocation { get; set; }
 }
