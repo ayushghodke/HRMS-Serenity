@@ -16,7 +16,8 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
     [HttpPost, AuthorizeList(typeof(LeaveRow))]
     public LeaveDashboardStatsResponse GetStats(IDbConnection connection, LeaveDashboardFilterRequest request)
     {
-        var where = BuildWhere(request);
+        var statsWhere = BuildWhere(request, tableAlias: "lp");
+        var leaveWhere = BuildWhere(request, tableAlias: "l");
 
         var sql = $@"
             SELECT
@@ -28,7 +29,7 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
             FROM EmployeeLeaveProfiles lp
             INNER JOIN Employees e ON e.EmployeeId = lp.EmployeeId
             LEFT JOIN Departments d ON d.DepartmentId = e.DepartmentId
-            WHERE 1 = 1 {where}
+            WHERE 1 = 1 {statsWhere}
         ";
 
         var stats = connection.Query<LeaveDashboardStatsResponse>(sql, new
@@ -46,7 +47,7 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
             LEFT JOIN Departments d ON d.DepartmentId = e.DepartmentId
             WHERE CAST(GETDATE() AS DATE) BETWEEN CAST(l.StartDate AS DATE) AND CAST(l.EndDate AS DATE)
               AND l.FinalStatus IN (1, 2)
-        " + where;
+        " + leaveWhere;
 
         stats.EmployeesOnLeaveToday = connection.Query<int>(todaySql, new
         {
@@ -64,7 +65,7 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
             WHERE CAST(l.StartDate AS DATE) > CAST(GETDATE() AS DATE)
               AND CAST(l.StartDate AS DATE) <= DATEADD(DAY, 7, CAST(GETDATE() AS DATE))
               AND l.FinalStatus IN (0, 1, 2)
-        " + where;
+        " + leaveWhere;
 
         stats.UpcomingLeaves = connection.Query<int>(upcomingSql, new
         {

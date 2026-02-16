@@ -58,6 +58,7 @@ public static partial class Views
 
         public static partial class LeaveReports
         {
+            public const string LeaveHistoryReport = "~/Modules/Operations/LeaveReports/LeaveHistoryReport.cshtml";
             public const string LeaveReportsIndex = "~/Modules/Operations/LeaveReports/LeaveReportsIndex.cshtml";
         }
 

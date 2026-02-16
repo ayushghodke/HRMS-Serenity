@@ -22,7 +22,8 @@
         <button id="export-history-excel" class="btn btn-success"><i class="fa fa-file-excel-o"></i> History Excel</button>
         <button id="export-dept-excel" class="btn btn-success"><i class="fa fa-file-excel-o"></i> Dept Summary Excel</button>
         <button id="export-monthly-excel" class="btn btn-success"><i class="fa fa-file-excel-o"></i> Monthly Excel</button>
-        <button id="export-pdf" class="btn btn-default"><i class="fa fa-file-pdf-o"></i> PDF (Reporting Service)</button>
+        <button id="export-pdf" class="btn btn-default"><i class="fa fa-file-pdf-o"></i> Export PDF</button>
+        <button id="export-word" class="btn btn-default"><i class="fa fa-file-word-o"></i> Export Word</button>
     </div>
 
     <div class="reports-grid">
@@ -170,14 +171,18 @@
         document.body.removeChild(form);
     }
 
+    function exportReport(ext) {
+        const reportUrl = Q.resolveUrl('~/Report/Download?key=Operations.LeaveHistory&ext=' + encodeURIComponent(ext));
+        window.open(reportUrl, '_blank');
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         loadReports();
         document.getElementById('load-leave-reports').addEventListener('click', loadReports);
         document.getElementById('export-history-excel').addEventListener('click', function () { postDownload('Operations/LeaveReports/LeaveHistoryExcel', getFilterRequest()); });
         document.getElementById('export-dept-excel').addEventListener('click', function () { postDownload('Operations/LeaveReports/DepartmentSummaryExcel', getFilterRequest()); });
         document.getElementById('export-monthly-excel').addEventListener('click', function () { postDownload('Operations/LeaveReports/MonthlySummaryExcel', getFilterRequest()); });
-        document.getElementById('export-pdf').addEventListener('click', function () {
-            Q.notifyInfo('PDF is routed through Serenity reporting service and needs report template keys for final output wiring.');
-        });
+        document.getElementById('export-pdf').addEventListener('click', function () { exportReport('pdf'); });
+        document.getElementById('export-word').addEventListener('click', function () { exportReport('docx'); });
     });
 </script>

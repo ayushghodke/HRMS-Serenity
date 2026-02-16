@@ -1,0 +1,57 @@
+@model List<HRMS.Operations.LeaveReportRow>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Leave History Report</title>
+    <style>
+        body { font-family: Segoe UI, Arial, sans-serif; font-size: 12px; color: #222; }
+        h2 { margin: 0 0 10px; }
+        .meta { margin-bottom: 12px; color: #666; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #d1d5db; padding: 6px 8px; text-align: left; }
+        th { background: #f3f4f6; }
+        .right { text-align: right; }
+    </style>
+</head>
+<body>
+    <h2>Leave History Report</h2>
+    <div class="meta">Generated on @DateTime.Now.ToString("dd MMM yyyy HH:mm")</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Application No</th>
+                <th>Employee</th>
+                <th>Department</th>
+                <th>Leave Type</th>
+                <th>From</th>
+                <th>To</th>
+                <th class="right">Total</th>
+                <th class="right">Paid</th>
+                <th class="right">Unpaid</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var row in Model ?? new List<HRMS.Operations.LeaveReportRow>())
+        {
+            <tr>
+                <td>@(row.LeaveApplicationNo ?? "-")</td>
+                <td>@(row.EmployeeName ?? "-")</td>
+                <td>@(row.DepartmentName ?? "-")</td>
+                <td>@(row.LeaveTypeName ?? "-")</td>
+                <td>@(row.StartDate?.ToString("dd MMM yyyy") ?? "-")</td>
+                <td>@(row.EndDate?.ToString("dd MMM yyyy") ?? "-")</td>
+                <td class="right">@row.TotalDays</td>
+                <td class="right">@row.PaidDays</td>
+                <td class="right">@row.UnpaidDays</td>
+                <td>@row.FinalStatus</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</body>
+</html>
