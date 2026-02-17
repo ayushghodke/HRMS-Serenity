@@ -9,4 +9,9 @@ export class LeaveApprovalGrid extends EntityGrid<LeaveApprovalRow> {
     protected override getDialogType() { return LeaveApprovalDialog; }
     protected override getRowDefinition() { return LeaveApprovalRow; }
     protected override getService() { return LeaveApprovalService.baseUrl; }
+
+    protected override getButtons() {
+        const buttons = super.getButtons();
+        return buttons.filter(x => x.cssClass !== 'add-button');
+    }
 }

@@ -84,7 +84,7 @@ export class LeaveGrid extends EntityGrid<LeaveRow> {
         confirmDialog('Are you sure you want to approve this leave request?', () => {
             serviceCall({
                 url: LeaveService.baseUrl + '/Approve',
-                request: leaveId,
+                request: { LeaveId: leaveId },
                 onSuccess: () => {
                     notifySuccess('Leave approved successfully.');
                     this.refresh();
@@ -97,10 +97,16 @@ export class LeaveGrid extends EntityGrid<LeaveRow> {
     }
 
     private rejectLeave(leaveId: number): void {
+        const remarks = window.prompt('Please provide rejection remarks:');
+        if (!remarks || !remarks.trim()) {
+            notifyError('Rejection remarks are required.');
+            return;
+        }
+
         confirmDialog('Are you sure you want to reject this leave request?', () => {
             serviceCall({
                 url: LeaveService.baseUrl + '/Reject',
-                request: leaveId,
+                request: { LeaveId: leaveId, Remarks: remarks.trim() },
                 onSuccess: () => {
                     notifySuccess('Leave rejected successfully.');
                     this.refresh();

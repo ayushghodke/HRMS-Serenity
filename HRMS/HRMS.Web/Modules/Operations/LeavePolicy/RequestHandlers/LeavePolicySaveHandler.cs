@@ -17,6 +17,7 @@ public class LeavePolicySaveHandler : SaveRequestHandler<MyRow, MyRequest, MyRes
         if (!Row.PayrollCutoffDay.HasValue || Row.PayrollCutoffDay.Value <= 0 || Row.PayrollCutoffDay.Value > 30)
             Row.PayrollCutoffDay = 30;
 
-        Row.ApprovalLevels = ApprovalLevelMode.FixedTwoLevel;
+        if (!Row.ApprovalLevels.HasValue)
+            Row.ApprovalLevels = ApprovalLevelMode.FixedTwoLevel;
     }
 }

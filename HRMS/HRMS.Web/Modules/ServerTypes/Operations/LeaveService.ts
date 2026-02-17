@@ -1,4 +1,5 @@
-﻿import { DeleteRequest, DeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, serviceRequest } from "@serenity-is/corelib";
+﻿import { DeleteRequest, DeleteResponse, ListRequest, ListResponse, RetrieveRequest, RetrieveResponse, SaveRequest, SaveResponse, ServiceOptions, serviceRequest, ServiceResponse } from "@serenity-is/corelib";
+import { LeaveActionRequest } from "./LeaveActionRequest";
 import { LeaveRow } from "./LeaveRow";
 
 export namespace LeaveService {
@@ -9,13 +10,19 @@ export namespace LeaveService {
     export declare function Delete(request: DeleteRequest, onSuccess?: (response: DeleteResponse) => void, opt?: ServiceOptions<any>): PromiseLike<DeleteResponse>;
     export declare function Retrieve(request: RetrieveRequest, onSuccess?: (response: RetrieveResponse<LeaveRow>) => void, opt?: ServiceOptions<any>): PromiseLike<RetrieveResponse<LeaveRow>>;
     export declare function List(request: ListRequest, onSuccess?: (response: ListResponse<LeaveRow>) => void, opt?: ServiceOptions<any>): PromiseLike<ListResponse<LeaveRow>>;
+    export declare function Approve(request: LeaveActionRequest, onSuccess?: (response: ServiceResponse) => void, opt?: ServiceOptions<any>): PromiseLike<ServiceResponse>;
+    export declare function Reject(request: LeaveActionRequest, onSuccess?: (response: ServiceResponse) => void, opt?: ServiceOptions<any>): PromiseLike<ServiceResponse>;
+    export declare function Cancel(request: LeaveActionRequest, onSuccess?: (response: ServiceResponse) => void, opt?: ServiceOptions<any>): PromiseLike<ServiceResponse>;
 
     export const Methods = {
         Create: "Operations/Leave/Create",
         Update: "Operations/Leave/Update",
         Delete: "Operations/Leave/Delete",
         Retrieve: "Operations/Leave/Retrieve",
-        List: "Operations/Leave/List"
+        List: "Operations/Leave/List",
+        Approve: "Operations/Leave/Approve",
+        Reject: "Operations/Leave/Reject",
+        Cancel: "Operations/Leave/Cancel"
     } as const;
 
     [
@@ -23,7 +30,10 @@ export namespace LeaveService {
         'Update',
         'Delete',
         'Retrieve',
-        'List'
+        'List',
+        'Approve',
+        'Reject',
+        'Cancel'
     ].forEach(x => {
         (<any>LeaveService)[x] = function (r, s, o) {
             return serviceRequest(baseUrl + '/' + x, r, s, o);

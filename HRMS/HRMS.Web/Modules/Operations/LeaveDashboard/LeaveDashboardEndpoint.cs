@@ -37,7 +37,9 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
             request.Branch,
             request.DepartmentId,
             request.EmployeeId,
-            request.LeaveTypeId
+            request.LeaveTypeId,
+            request.DateFrom,
+            request.DateTo
         }).FirstOrDefault() ?? new LeaveDashboardStatsResponse();
 
         var todaySql = @"
@@ -54,7 +56,9 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
             request.Branch,
             request.DepartmentId,
             request.EmployeeId,
-            request.LeaveTypeId
+            request.LeaveTypeId,
+            request.DateFrom,
+            request.DateTo
         }).FirstOrDefault();
 
         var upcomingSql = @"
@@ -72,7 +76,9 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
             request.Branch,
             request.DepartmentId,
             request.EmployeeId,
-            request.LeaveTypeId
+            request.LeaveTypeId,
+            request.DateFrom,
+            request.DateTo
         }).FirstOrDefault();
 
         return stats;
@@ -83,7 +89,9 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
     {
         var where = BuildWhere(request, tableAlias: "l");
         var sql = $@"
-            SELECT FORMAT(CAST(l.StartDate AS DATE), 'MMM yyyy') AS Label,
+            SELECT
+                   YEAR(l.StartDate) AS YearNumber,
+                   MONTH(l.StartDate) AS MonthNumber,
                    ISNULL(SUM(ISNULL(l.TotalDays, 0)), 0) AS Value
             FROM Leaves l
             INNER JOIN Employees e ON e.EmployeeId = l.EmployeeId
@@ -91,22 +99,25 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
             WHERE l.StartDate >= DATEADD(MONTH, -11, DATEFROMPARTS(YEAR(GETDATE()), MONTH(GETDATE()), 1))
               AND l.FinalStatus IN (1, 2)
               {where}
-            GROUP BY YEAR(l.StartDate), MONTH(l.StartDate), FORMAT(CAST(l.StartDate AS DATE), 'MMM yyyy')
+            GROUP BY YEAR(l.StartDate), MONTH(l.StartDate)
             ORDER BY YEAR(l.StartDate), MONTH(l.StartDate)
         ";
 
-        var rows = connection.Query<(string Label, decimal Value)>(sql, new
+        var rows = connection.Query<(int YearNumber, int MonthNumber, decimal Value)>(sql, new
         {
             request.Branch,
             request.DepartmentId,
             request.EmployeeId,
-            request.LeaveTypeId
+            request.LeaveTypeId,
+            request.DateFrom,
+            request.DateTo
         });
 
         var response = new LeaveTrendResponse();
         foreach (var row in rows)
         {
-            response.Labels.Add(row.Label);
+            var labelDate = new DateTime(row.YearNumber, row.MonthNumber, 1);
+            response.Labels.Add(labelDate.ToString("MMM yyyy"));
             response.Values.Add(row.Value);
         }
 
@@ -116,11 +127,18 @@ public class LeaveDashboardEndpoint : ServiceEndpoint
     private static string BuildWhere(LeaveDashboardFilterRequest request, string tableAlias = "lp")
     {
         var leaveTypeColumn = tableAlias == "lp" ? "lp.LeaveTypeId" : "l.LeaveTypeId";
+        var leaveDateFilter = tableAlias == "lp"
+            ? string.Empty
+            : @"
+            AND (@DateFrom IS NULL OR l.EndDate >= @DateFrom)
+            AND (@DateTo IS NULL OR l.StartDate < DATEADD(DAY, 1, @DateTo))";
+
         return $@"
             AND (@Branch IS NULL OR @Branch = '' OR e.EmployeeCode IS NOT NULL)
             AND (@DepartmentId IS NULL OR e.DepartmentId = @DepartmentId)
             AND (@EmployeeId IS NULL OR e.EmployeeId = @EmployeeId)
             AND (@LeaveTypeId IS NULL OR {leaveTypeColumn} = @LeaveTypeId)
+            {leaveDateFilter}
         ";
     }
 }

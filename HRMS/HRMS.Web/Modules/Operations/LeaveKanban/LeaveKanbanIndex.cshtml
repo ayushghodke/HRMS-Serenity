@@ -318,6 +318,8 @@
 
     function callTransition(leaveId, toStatus) {
         var endpoint = null;
+        var request = { LeaveId: leaveId };
+
         if (toStatus === 1 || toStatus === 2)
             endpoint = 'Operations/Leave/Approve';
         else if (toStatus === -1)
@@ -325,13 +327,25 @@
         else if (toStatus === -2)
             endpoint = 'Operations/Leave/Cancel';
 
+        if (toStatus === -1 || toStatus === -2) {
+            var actionName = toStatus === -1 ? 'rejection' : 'cancellation';
+            var remarks = window.prompt('Please provide ' + actionName + ' remarks:');
+            if (!remarks || !remarks.trim()) {
+                Q.notifyError('Remarks are required.');
+                loadLeaves();
+                return;
+            }
+
+            request.Remarks = remarks.trim();
+        }
+
         if (!endpoint) {
             Q.notifyError('Unsupported transition');
             loadLeaves();
             return;
         }
 
-        Q.serviceRequest(endpoint, leaveId, function () {
+        Q.serviceRequest(endpoint, request, function () {
             Q.notifySuccess('Leave workflow updated successfully.');
             notifyLeaveWorkflowChanged();
             loadLeaves();

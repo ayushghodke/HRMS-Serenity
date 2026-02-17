@@ -18,21 +18,21 @@ public class LeaveBalanceEndpoint : ServiceEndpoint
     public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,
         [FromServices] ILeaveBalanceSaveHandler handler)
     {
-        return handler.Create(uow, request);
+        throw new ValidationError("ReadOnlyProjection", "Leave balances are derived from employee leave profiles and cannot be created manually.");
     }
 
     [HttpPost, AuthorizeUpdate(typeof(MyRow))]
     public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request,
         [FromServices] ILeaveBalanceSaveHandler handler)
     {
-        return handler.Update(uow, request);
+        throw new ValidationError("ReadOnlyProjection", "Leave balances are derived from employee leave profiles and cannot be edited manually.");
     }
  
     [HttpPost, AuthorizeDelete(typeof(MyRow))]
     public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request,
         [FromServices] ILeaveBalanceDeleteHandler handler)
     {
-        return handler.Delete(uow, request);
+        throw new ValidationError("ReadOnlyProjection", "Leave balances are derived from employee leave profiles and cannot be deleted manually.");
     }
 
     [HttpPost, AuthorizeRetrieve(typeof(MyRow))]
@@ -64,89 +64,77 @@ public class LeaveBalanceEndpoint : ServiceEndpoint
     public SaveResponse RecalculateAllBalances(IUnitOfWork uow)
     {
         var currentYear = DateTime.Now.Year;
-        var employeeFld = HR.EmployeeRow.Fields;
-        var balanceFld = MyRow.Fields;
-        var leaveFld = Operations.LeaveRow.Fields;
-        
-        // Get all active employees
-        var employees = uow.Connection.List<HR.EmployeeRow>(
-            employeeFld.Status == (int)HR.EmployeeStatus.Active);
-        
-        int processed = 0;
-        
-        foreach (var employee in employees)
-        {
-            var usedPaid = 0m;
-            var usedUnpaid = 0m;
-            var leaves = uow.Connection.List<Operations.LeaveRow>(
-                leaveFld.EmployeeId == employee.EmployeeId.Value &
-                leaveFld.Status == (int)Operations.LeaveStatus.Approved);
 
-            foreach (var leave in leaves)
-            {
-                var totalDays = (decimal)(leave.TotalDays ?? 0);
-                usedPaid += leave.PaidDays ?? (leave.LeaveType == Operations.LeaveType.PaidLeave ? totalDays : 0m);
-                usedUnpaid += leave.UnpaidDays ?? (leave.LeaveType == Operations.LeaveType.Unpaid ? totalDays : 0m);
-            }
+        var syncProfilesSql = @"
+            ;WITH LeaveUsage AS
+            (
+                SELECT
+                    l.EmployeeId,
+                    l.LeaveTypeId,
+                    SUM(CASE WHEN ISNULL(l.FinalStatus, 0) = 2 THEN ISNULL(l.PaidDays, 0) ELSE 0 END) AS UsedLeave,
+                    SUM(CASE WHEN ISNULL(l.FinalStatus, 0) = 2 THEN ISNULL(l.UnpaidDays, 0) ELSE 0 END) AS LOPDays,
+                    SUM(CASE WHEN ISNULL(l.FinalStatus, 0) IN (0, 1) THEN ISNULL(l.TotalDays, 0) ELSE 0 END) AS PendingLeave
+                FROM Leaves l
+                WHERE l.StartDate < DATEFROMPARTS(@CurrentYear + 1, 1, 1)
+                  AND l.EndDate >= DATEFROMPARTS(@CurrentYear, 1, 1)
+                  AND l.LeaveTypeId IS NOT NULL
+                GROUP BY l.EmployeeId, l.LeaveTypeId
+            )
+            UPDATE ep
+            SET
+                ep.UsedLeave = ISNULL(lu.UsedLeave, 0),
+                ep.PendingLeave = ISNULL(lu.PendingLeave, 0),
+                ep.LOPDays = ISNULL(lu.LOPDays, 0),
+                ep.LastUpdatedDate = GETDATE()
+            FROM EmployeeLeaveProfiles ep
+            LEFT JOIN LeaveUsage lu
+                ON lu.EmployeeId = ep.EmployeeId
+               AND lu.LeaveTypeId = ep.LeaveTypeId;
+        ";
 
-            var annualPaidAllocation = Math.Max(0, (employee.PaidLeavesPerMonth ?? 2) * 12);
+        uow.Connection.Execute(syncProfilesSql, new { CurrentYear = currentYear });
 
-            var existingPaidBalance = uow.Connection.TryFirst<MyRow>(
-                balanceFld.EmployeeId == employee.EmployeeId.Value &
-                balanceFld.LeaveType == (int)Operations.LeaveType.PaidLeave &
-                balanceFld.Year == currentYear);
+        var syncLegacyBalancesSql = @"
+            ;WITH PaidSource AS
+            (
+                SELECT
+                    ep.EmployeeId,
+                    SUM(ISNULL(ep.OpeningBalance, 0) + ISNULL(ep.AccruedLeave, 0) + ISNULL(ep.CarryForwardLeave, 0)) AS Allocated,
+                    SUM(ISNULL(ep.UsedLeave, 0)) AS Used
+                FROM EmployeeLeaveProfiles ep
+                INNER JOIN LeaveTypes lt ON lt.LeaveTypeId = ep.LeaveTypeId
+                WHERE ISNULL(lt.LeaveCategory, 0) = 1
+                GROUP BY ep.EmployeeId
+            ),
+            UnpaidSource AS
+            (
+                SELECT
+                    ep.EmployeeId,
+                    CAST(0 AS DECIMAL(18, 2)) AS Allocated,
+                    SUM(ISNULL(ep.LOPDays, 0)) AS Used
+                FROM EmployeeLeaveProfiles ep
+                GROUP BY ep.EmployeeId
+            ),
+            SourceRows AS
+            (
+                SELECT EmployeeId, 1 AS LeaveType, Allocated, Used FROM PaidSource
+                UNION ALL
+                SELECT EmployeeId, 2 AS LeaveType, Allocated, Used FROM UnpaidSource
+            )
+            MERGE LeaveBalances AS tgt
+            USING SourceRows AS src
+                ON tgt.EmployeeId = src.EmployeeId
+               AND tgt.LeaveType = src.LeaveType
+               AND tgt.[Year] = @CurrentYear
+            WHEN MATCHED THEN
+                UPDATE SET tgt.Allocated = src.Allocated, tgt.Used = src.Used
+            WHEN NOT MATCHED THEN
+                INSERT (EmployeeId, LeaveType, [Year], Allocated, Used)
+                VALUES (src.EmployeeId, src.LeaveType, @CurrentYear, src.Allocated, src.Used);
+        ";
 
-            if (existingPaidBalance != null)
-            {
-                uow.Connection.UpdateById(new MyRow
-                {
-                    LeaveBalanceId = existingPaidBalance.LeaveBalanceId,
-                    Allocated = annualPaidAllocation,
-                    Used = usedPaid
-                });
-            }
-            else
-            {
-                uow.Connection.Insert(new MyRow
-                {
-                    EmployeeId = employee.EmployeeId.Value,
-                    LeaveType = Operations.LeaveType.PaidLeave,
-                    Year = currentYear,
-                    Allocated = annualPaidAllocation,
-                    Used = usedPaid
-                });
-            }
+        uow.Connection.Execute(syncLegacyBalancesSql, new { CurrentYear = currentYear });
 
-            var existingUnpaidBalance = uow.Connection.TryFirst<MyRow>(
-                balanceFld.EmployeeId == employee.EmployeeId.Value &
-                balanceFld.LeaveType == (int)Operations.LeaveType.Unpaid &
-                balanceFld.Year == currentYear);
-
-            if (existingUnpaidBalance != null)
-            {
-                uow.Connection.UpdateById(new MyRow
-                {
-                    LeaveBalanceId = existingUnpaidBalance.LeaveBalanceId,
-                    Allocated = 0,
-                    Used = usedUnpaid
-                });
-            }
-            else
-            {
-                uow.Connection.Insert(new MyRow
-                {
-                    EmployeeId = employee.EmployeeId.Value,
-                    LeaveType = Operations.LeaveType.Unpaid,
-                    Year = currentYear,
-                    Allocated = 0,
-                    Used = usedUnpaid
-                });
-            }
-            
-            processed++;
-        }
-        
-        // Return success (message will be shown in UI)
         return new SaveResponse();
     }
 
@@ -154,14 +142,7 @@ public class LeaveBalanceEndpoint : ServiceEndpoint
     public ListResponse<MyRow> GetEmployeeBalances(IDbConnection connection, [FromBody] int employeeId,
         [FromServices] ILeaveBalanceListHandler handler)
     {
-        var currentYear = DateTime.Now.Year;
-        var request = new ListRequest
-        {
-            Criteria = new Criteria(MyRow.Fields.EmployeeId.PropertyName) == employeeId & 
-                       new Criteria(MyRow.Fields.Year.PropertyName) == currentYear
-        };
-        
-        return handler.List(connection, request);
+        throw new ValidationError("DeprecatedEndpoint", "GetEmployeeBalances is deprecated. Use EmployeeLeaveProfile list APIs as the canonical balance source.");
     }
 
     [HttpPost, AuthorizeUpdate(typeof(MyRow))]

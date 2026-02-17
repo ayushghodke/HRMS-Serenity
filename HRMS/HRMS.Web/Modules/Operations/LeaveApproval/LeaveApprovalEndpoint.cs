@@ -18,21 +18,21 @@ public class LeaveApprovalEndpoint : ServiceEndpoint
     public SaveResponse Create(IUnitOfWork uow, SaveRequest<MyRow> request,
         [FromServices] ILeaveApprovalSaveHandler handler)
     {
-        return handler.Create(uow, request);
+        throw new ValidationError("ReadOnlyAudit", "Leave approvals are workflow audit entries and cannot be created manually.");
     }
 
     [HttpPost, AuthorizeUpdate(typeof(MyRow))]
     public SaveResponse Update(IUnitOfWork uow, SaveRequest<MyRow> request,
         [FromServices] ILeaveApprovalSaveHandler handler)
     {
-        return handler.Update(uow, request);
+        throw new ValidationError("ReadOnlyAudit", "Leave approvals are workflow audit entries and cannot be edited manually.");
     }
 
     [HttpPost, AuthorizeDelete(typeof(MyRow))]
     public DeleteResponse Delete(IUnitOfWork uow, DeleteRequest request,
         [FromServices] ILeaveApprovalDeleteHandler handler)
     {
-        return handler.Delete(uow, request);
+        throw new ValidationError("ReadOnlyAudit", "Leave approvals are workflow audit entries and cannot be deleted manually.");
     }
 
     [HttpPost, AuthorizeRetrieve(typeof(MyRow))]

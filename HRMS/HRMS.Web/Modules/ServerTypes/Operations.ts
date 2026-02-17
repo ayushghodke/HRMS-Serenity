@@ -23,6 +23,7 @@ export * from "./Operations/HolidayRow";
 export * from "./Operations/HolidayService";
 export * from "./Operations/HolidayType";
 export * from "./Operations/HrApprovalStatus";
+export * from "./Operations/LeaveActionRequest";
 export * from "./Operations/LeaveApprovalColumns";
 export * from "./Operations/LeaveApprovalForm";
 export * from "./Operations/LeaveApprovalRow";

@@ -120,7 +120,7 @@
             },
             events: function(info, successCallback, failureCallback) {
                 Q.serviceRequest('Services/Operations/Leave/List', {
-                    Criteria: [[["StartDate"], ">=", info.startStr], "and", [["EndDate"], "<=", info.endStr]]
+                    Criteria: [[["StartDate"], "<=", info.endStr], "and", [["EndDate"], ">=", info.startStr]]
                 }, function(response) {
                     var events = response.Entities.map(function(leave) {
                         var leaveTypeClass = '';

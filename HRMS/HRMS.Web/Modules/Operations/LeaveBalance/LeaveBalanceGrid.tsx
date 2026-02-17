@@ -11,7 +11,7 @@ export class LeaveBalanceGrid extends EntityGrid<LeaveBalanceRow> {
     protected override getService() { return LeaveBalanceService.baseUrl; }
 
     protected override getButtons() {
-        const buttons = super.getButtons();
+        const buttons = super.getButtons().filter(x => x.cssClass !== 'add-button');
 
         buttons.push({
             title: 'Recalculate Balances',
