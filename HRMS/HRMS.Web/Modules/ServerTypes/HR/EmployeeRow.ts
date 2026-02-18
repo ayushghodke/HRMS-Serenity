@@ -32,7 +32,7 @@ export interface EmployeeRow {
 
 export abstract class EmployeeRow {
     static readonly idProperty = 'EmployeeId';
-    static readonly nameProperty = 'FirstName';
+    static readonly nameProperty = 'FullName';
     static readonly localTextPrefix = 'HR.Employee';
     static readonly lookupKey = 'HR.Employee';
 

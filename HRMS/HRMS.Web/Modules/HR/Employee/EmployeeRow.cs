@@ -28,13 +28,13 @@ public sealed class EmployeeRow : Row<EmployeeRow.RowFields>, IIdRow, INameRow
     [DisplayName("Employee Code"), Size(50), QuickSearch]
     public string EmployeeCode { get => fields.EmployeeCode[this]; set => fields.EmployeeCode[this] = value; }
 
-    [DisplayName("First Name"), Size(100), NotNull, NameProperty]
+    [DisplayName("First Name"), Size(100), NotNull]
     public string FirstName { get => fields.FirstName[this]; set => fields.FirstName[this] = value; }
 
     [DisplayName("Last Name"), Size(100), NotNull]
     public string LastName { get => fields.LastName[this]; set => fields.LastName[this] = value; }
 
-    [DisplayName("Full Name"), Expression("(t0.FirstName + ' ' + t0.LastName)"), QuickSearch]
+    [DisplayName("Full Name"), Expression("(t0.FirstName + ' ' + t0.LastName)"), QuickSearch, NameProperty]
     public string FullName { get => fields.FullName[this]; set => fields.FullName[this] = value; }
 
     [DisplayName("Email"), Size(100)]
