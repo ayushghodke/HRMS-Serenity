@@ -44,6 +44,7 @@ public sealed class AssetsRow : Row<AssetsRow.RowFields>, IIdRow, INameRow
     public string Description { get => fields.Description[this]; set => fields.Description[this] = value; }
 
     [DisplayName("Assigned To"), Expression($"{jAssignedTo}.[FirstName] + ' ' + {jAssignedTo}.[LastName]")]
+    [MinSelectLevel(SelectLevel.List)]
     public string AssignedToFullName { get => fields.AssignedToFullName[this]; set => fields.AssignedToFullName[this] = value; }
 
     public class RowFields : RowFieldsBase
