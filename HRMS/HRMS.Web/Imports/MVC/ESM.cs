@@ -27,6 +27,10 @@ public static partial class ESM
     public const string SalaryGradePage = "~/esm/Modules/Operations/SalaryGrade/SalaryGradePage.js";
     public const string ScriptInit = "~/esm/Modules/Common/ScriptInit.js";
     public const string SignUpPage = "~/esm/Modules/Membership/Account/SignUp/SignUpPage.js";
+    public const string SocialAccountPage = "~/esm/Modules/Communication/SocialAccount/SocialAccountPage.js";
+    public const string SocialCalendarPage = "~/esm/Modules/Communication/SocialCalendar/SocialCalendarPage.js";
+    public const string SocialPlatformConfigPage = "~/esm/Modules/Communication/SocialPlatformConfig/SocialPlatformConfigPage.js";
+    public const string SocialPostPage = "~/esm/Modules/Communication/SocialPost/SocialPostPage.js";
     public const string TaskPage = "~/esm/Modules/Operations/Task/TaskPage.js";
     public const string TranslationPage = "~/esm/Modules/Administration/Translation/TranslationPage.js";
     public const string UserPage = "~/esm/Modules/Administration/User/UserPage.js";
@@ -66,6 +70,26 @@ public static partial class ESM
             public static partial class Notice
             {
                 public const string NoticePage = "~/esm/Modules/Communication/Notice/NoticePage.js";
+            }
+
+            public static partial class SocialAccount
+            {
+                public const string SocialAccountPage = "~/esm/Modules/Communication/SocialAccount/SocialAccountPage.js";
+            }
+
+            public static partial class SocialCalendar
+            {
+                public const string SocialCalendarPage = "~/esm/Modules/Communication/SocialCalendar/SocialCalendarPage.js";
+            }
+
+            public static partial class SocialPlatformConfig
+            {
+                public const string SocialPlatformConfigPage = "~/esm/Modules/Communication/SocialPlatformConfig/SocialPlatformConfigPage.js";
+            }
+
+            public static partial class SocialPost
+            {
+                public const string SocialPostPage = "~/esm/Modules/Communication/SocialPost/SocialPostPage.js";
             }
         }
 

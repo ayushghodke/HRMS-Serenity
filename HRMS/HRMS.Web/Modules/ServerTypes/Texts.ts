@@ -101,6 +101,75 @@ namespace texts {
                 export const UpdateDate: string;
                 export const UpdateUserId: string;
             }
+            namespace SocialAccount {
+                export function asKey(): typeof SocialAccount;
+                export function asTry(): typeof SocialAccount;
+                export const AccessToken: string;
+                export const AccountName: string;
+                export const ConnectedDate: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const InsertDate: string;
+                export const InsertUserId: string;
+                export const IsActive: string;
+                export const Platform: string;
+                export const ProfileUrl: string;
+                export const RefreshToken: string;
+                export const SocialAccountId: string;
+                export const TokenExpiry: string;
+                export const UpdateDate: string;
+                export const UpdateUserId: string;
+            }
+            namespace SocialPlatformConfig {
+                export function asKey(): typeof SocialPlatformConfig;
+                export function asTry(): typeof SocialPlatformConfig;
+                export const ClientId: string;
+                export const ClientSecret: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const InsertDate: string;
+                export const InsertUserId: string;
+                export const IsEnabled: string;
+                export const Platform: string;
+                export const RedirectUri: string;
+                export const SocialPlatformConfigId: string;
+                export const UpdateDate: string;
+                export const UpdateUserId: string;
+            }
+            namespace SocialPost {
+                export function asKey(): typeof SocialPost;
+                export function asTry(): typeof SocialPost;
+                export const Content: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const ErrorMessage: string;
+                export const ExternalPostId: string;
+                export const InsertDate: string;
+                export const InsertUserId: string;
+                export const MediaList: string;
+                export const PostType: string;
+                export const PublishedDate: string;
+                export const ScheduledDate: string;
+                export const SocialAccountId: string;
+                export const SocialAccountName: string;
+                export const SocialAccountPlatform: string;
+                export const SocialPostId: string;
+                export const Status: string;
+                export const Title: string;
+                export const UpdateDate: string;
+                export const UpdateUserId: string;
+            }
+            namespace SocialPostMedia {
+                export function asKey(): typeof SocialPostMedia;
+                export function asTry(): typeof SocialPostMedia;
+                export const DisplayOrder: string;
+                export const EntityPlural: string;
+                export const EntitySingular: string;
+                export const FileName: string;
+                export const MediaType: string;
+                export const SocialPostId: string;
+                export const SocialPostMediaId: string;
+            }
         }
         namespace HR {
             export function asKey(): typeof HR;
@@ -619,7 +688,11 @@ const Texts: typeof texts = proxyTexts({}, '', {
             UserRole: {}
         },
         Communication: {
-            Notice: {}
+            Notice: {},
+            SocialAccount: {},
+            SocialPlatformConfig: {},
+            SocialPost: {},
+            SocialPostMedia: {}
         },
         HR: {
             Department: {},
