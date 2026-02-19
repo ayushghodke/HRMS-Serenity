@@ -1,4 +1,4 @@
-import { EntityGrid } from '@serenity-is/corelib';
+import { EditorUtils, EntityGrid } from '@serenity-is/corelib';
 import { CandidatesColumns, CandidatesRow, CandidatesService } from '../../ServerTypes/Recruitment';
 import { CandidatesDialog } from './CandidatesDialog';
 import { InterviewsDialog } from '../Interviews/InterviewsDialog';
@@ -11,6 +11,7 @@ class ScheduleInterviewDialog extends InterviewsDialog {
     protected override afterLoadEntity() {
         super.afterLoadEntity();
         this.form.CandidateId.value = this.candidateId?.toString();
+        EditorUtils.setReadonly(this.form.CandidateId, true);
     }
 }
 
