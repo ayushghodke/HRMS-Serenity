@@ -41,7 +41,7 @@ public sealed class TaskRow : Row<TaskRow.RowFields>, IIdRow, INameRow
     [DisplayName("Status"), NotNull, DefaultValue(TaskStatus.Open)]
     public TaskStatus? Status { get => (TaskStatus?)fields.Status[this]; set => fields.Status[this] = (int?)value; }
 
-    [DisplayName("Assigned To Name"), Origin(jAssignedTo, nameof(EmployeeRow.FullName))]
+    [DisplayName("Assigned To Name"), Origin(jAssignedTo, nameof(EmployeeRow.FullName)), MinSelectLevel(SelectLevel.List)]
     public string AssignedToFullName { get => fields.AssignedToFullName[this]; set => fields.AssignedToFullName[this] = value; }
 
     [DisplayName("Assigned By Username"), Origin(jAssignedBy, nameof(UserRow.Username))]

@@ -300,7 +300,9 @@
         var tasks = [];
 
         function loadTasks() {
-            Q.serviceRequest('Operations/Task/List', {}, function(response) {
+            Q.serviceRequest('Operations/Task/List', {
+                IncludeColumns: ['TaskId', 'Title', 'Description', 'AssignedTo', 'AssignedToFullName', 'DueDate', 'Status']
+            }, function(response) {
                 tasks = response.Entities;
                 renderKanban();
             });
@@ -379,6 +381,10 @@
             card.className = 'task-card';
             const taskId = task.TaskId || task.taskId;
             card.setAttribute('data-id', taskId);
+
+            var assigneeName = task.AssignedToFullName || task.assignedToFullName;
+            var assigneeId = task.AssignedTo || task.assignedTo;
+            var assigneeText = assigneeName || (assigneeId ? ('Employee #' + assigneeId) : 'Unassigned');
             
             var dueDate = task.DueDate ? new Date(task.DueDate) : null;
             var dateStr = dueDate ? dueDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'No date';
@@ -388,7 +394,7 @@
                 '<div class="task-title">' + (task.Title || task.title || 'Untitled') + '</div>' +
                 (task.Description || task.description ? '<div class="task-desc">' + (task.Description || task.description) + '</div>' : '') +
                 '<div class="task-footer">' +
-                    '<div class="task-assignee"><i class="fa fa-user-circle"></i> ' + (task.AssignedToFullName || task.assignedToFullName || 'Unassigned') + '</div>' +
+                    '<div class="task-assignee"><i class="fa fa-user-circle"></i> ' + assigneeText + '</div>' +
                     '<div class="task-date ' + (isOverdue ? 'overdue' : '') + '"><i class="fa fa-calendar"></i> ' + dateStr + '</div>' +
                 '</div>';
 
