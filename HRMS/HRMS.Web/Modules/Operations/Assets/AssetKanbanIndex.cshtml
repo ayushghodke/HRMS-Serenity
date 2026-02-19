@@ -166,6 +166,55 @@
         font-style: italic;
     }
 
+    .assign-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .assign-modal {
+        width: min(92vw, 420px);
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        padding: 18px;
+    }
+
+    .assign-modal h4 {
+        margin: 0 0 12px;
+        font-size: 18px;
+        color: #2c3e50;
+    }
+
+    .assign-modal p {
+        margin: 0 0 10px;
+        color: #5d6d7e;
+        font-size: 13px;
+    }
+
+    .assign-modal select {
+        width: 100%;
+        height: 36px;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        padding: 4px 8px;
+    }
+
+    .assign-actions {
+        margin-top: 14px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .assign-actions .btn {
+        min-width: 88px;
+    }
+
     @@media (max-width: 1000px) {
         .kanban-board {
             grid-template-columns: repeat(2, 1fr);
@@ -183,6 +232,7 @@
 
 <script type="text/javascript">
     var assets = [];
+    var employeeLookupCache;
 
     function loadAssets() {
         Q.serviceRequest('Operations/Assets/List', {}, function(response) {
@@ -251,11 +301,16 @@
         return card;
     }
 
-    function updateAssetStatus(assetId, newStatus) {
-        Q.serviceRequest('Operations/Assets/UpdateStatus', {
+    function updateAssetStatus(assetId, newStatus, assignedTo) {
+        var request = {
             AssetId: parseInt(assetId),
             NewStatus: parseInt(newStatus)
-        }, function() {
+        };
+
+        if (assignedTo !== undefined && assignedTo !== null)
+            request.AssignedTo = parseInt(assignedTo);
+
+        Q.serviceRequest('Operations/Assets/UpdateStatus', request, function() {
             Q.notifySuccess('Asset status updated successfully!');
             loadAssets(); // Refresh
         }, {
@@ -263,6 +318,105 @@
                 Q.notifyError(response.Error.Message || 'Failed to update status');
                 loadAssets(); // Revert
             }
+        });
+    }
+
+    function getEmployeeLookup(callback) {
+        if (employeeLookupCache) {
+            callback(employeeLookupCache.lookup, employeeLookupCache.items);
+            return;
+        }
+
+        Q.getLookupAsync('HR.Employee').then(function(lookup) {
+            var items = lookup.items || [];
+            employeeLookupCache = { lookup: lookup, items: items };
+            callback(lookup, items);
+        }).catch(function() {
+            Q.notifyError('Unable to load employee list.');
+            callback(null, []);
+        });
+    }
+
+    function askWhoToAssign(onConfirm, onCancel) {
+        getEmployeeLookup(function(lookup, items) {
+            if (!lookup) {
+                onCancel();
+                return;
+            }
+
+            var overlay = document.createElement('div');
+            overlay.className = 'assign-overlay';
+
+            var modal = document.createElement('div');
+            modal.className = 'assign-modal';
+
+            var title = document.createElement('h4');
+            title.textContent = 'Who to assign?';
+
+            var subtitle = document.createElement('p');
+            subtitle.textContent = 'Select employee for this asset before moving to In Use.';
+
+            var select = document.createElement('select');
+            var emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.text = 'Select employee';
+            select.appendChild(emptyOption);
+
+            items.forEach(function(item) {
+                var option = document.createElement('option');
+                var idVal = item[lookup.idField] || item.id || item.EmployeeId || item.Id;
+                var textVal = item[lookup.textField] || item.text || item.FullName || item.Name || item.DisplayName;
+
+                if (idVal === undefined || idVal === null)
+                    return;
+
+                option.value = idVal;
+                option.text = textVal || ('Employee #' + idVal);
+                select.appendChild(option);
+            });
+
+            var actions = document.createElement('div');
+            actions.className = 'assign-actions';
+
+            var cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'btn btn-default';
+            cancelBtn.textContent = 'Cancel';
+
+            var assignBtn = document.createElement('button');
+            assignBtn.type = 'button';
+            assignBtn.className = 'btn btn-primary';
+            assignBtn.textContent = 'Assign';
+
+            actions.appendChild(cancelBtn);
+            actions.appendChild(assignBtn);
+
+            modal.appendChild(title);
+            modal.appendChild(subtitle);
+            modal.appendChild(select);
+            modal.appendChild(actions);
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            function closeModal() {
+                if (overlay && overlay.parentElement)
+                    overlay.parentElement.removeChild(overlay);
+            }
+
+            cancelBtn.addEventListener('click', function() {
+                closeModal();
+                onCancel();
+            });
+
+            assignBtn.addEventListener('click', function() {
+                if (!select.value) {
+                    Q.notifyError('Please select who to assign.');
+                    return;
+                }
+
+                closeModal();
+                onConfirm(parseInt(select.value, 10));
+            });
         });
     }
 
@@ -279,8 +433,18 @@
                 onEnd: function(evt) {
                     var assetId = evt.item.getAttribute('data-id');
                     var newStatus = evt.to.parentElement.getAttribute('data-status');
+                    var movedToInUse = parseInt(newStatus, 10) === 2;
                     
                     if (evt.from !== evt.to) {
+                        if (movedToInUse) {
+                            askWhoToAssign(function(assignedTo) {
+                                updateAssetStatus(assetId, newStatus, assignedTo);
+                            }, function() {
+                                loadAssets();
+                            });
+                            return;
+                        }
+
                         updateAssetStatus(assetId, newStatus);
                     }
                 }

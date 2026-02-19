@@ -51,13 +51,18 @@ public class AssetsEndpoint : ServiceEndpoint
     public SaveResponse UpdateStatus(IUnitOfWork uow, AssetStatusUpdateRequest request,
         [FromServices] IAssetsSaveHandler handler)
     {
+        var entity = new MyRow
+        {
+            Status = (AssetStatus)request.NewStatus
+        };
+
+        if (request.AssignedTo.HasValue)
+            entity.AssignedTo = request.AssignedTo.Value;
+
         var saveRequest = new SaveRequest<MyRow>
         {
             EntityId = request.AssetId,
-            Entity = new MyRow
-            {
-                Status = (AssetStatus)request.NewStatus
-            }
+            Entity = entity
         };
 
         return handler.Update(uow, saveRequest);
@@ -68,4 +73,5 @@ public class AssetStatusUpdateRequest : ServiceRequest
 {
     public int AssetId { get; set; }
     public int NewStatus { get; set; }
+    public int? AssignedTo { get; set; }
 }

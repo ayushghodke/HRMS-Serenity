@@ -3,4 +3,5 @@
 export interface AssetStatusUpdateRequest extends ServiceRequest {
     AssetId?: number;
     NewStatus?: number;
+    AssignedTo?: number;
 }
