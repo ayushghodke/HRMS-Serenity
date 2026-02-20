@@ -2,6 +2,7 @@
 
 public static partial class ESM
 {
+    public const string AssetKanbanPage = "~/esm/Modules/Operations/Assets/AssetKanbanPage.js";
     public const string AssetsPage = "~/esm/Modules/Operations/Assets/AssetsPage.js";
     public const string AttendancePage = "~/esm/Modules/Operations/Attendance/AttendancePage.js";
     public const string CandidatesPage = "~/esm/Modules/Recruitment/Candidates/CandidatesPage.js";
@@ -136,6 +137,7 @@ public static partial class ESM
         {
             public static partial class Assets
             {
+                public const string AssetKanbanPage = "~/esm/Modules/Operations/Assets/AssetKanbanPage.js";
                 public const string AssetsPage = "~/esm/Modules/Operations/Assets/AssetsPage.js";
             }
 

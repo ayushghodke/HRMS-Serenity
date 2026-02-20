@@ -9,6 +9,7 @@ public class AssetKanbanPage : Controller
     [Route("Operations/AssetKanban")]
     public ActionResult Index()
     {
-        return View("~/Modules/Operations/Assets/AssetKanbanIndex.cshtml");
+        return this.GridPage("@/Operations/Assets/AssetKanbanPage",
+            "Asset Kanban Board");
     }
 }

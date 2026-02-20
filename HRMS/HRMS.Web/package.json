@@ -6,6 +6,7 @@
     "@serenity-is/domwise": "./node_modules/.dotnet/serenity.domwise",
     "@serenity-is/extensions": "./node_modules/.dotnet/serenity.extensions",
     "@serenity-is/sleekgrid": "./node_modules/.dotnet/serenity.sleekgrid",
+    "@types/sortablejs": "^1.15.9",
     "bootstrap-datepicker": "1.10.1",
     "chart.js": "4.5.1",
     "daterangepicker": "3.1.0",
@@ -16,7 +17,8 @@
     "jvectormap-content": "0.1.1",
     "jvectormap-next": "3.1.2",
     "moment": "2.30.1",
-    "preact": "10.27.2"
+    "preact": "10.27.2",
+    "sortablejs": "^1.15.7"
   },
   "devDependencies": {
     "@serenity-is/tsbuild": "9.1.0"

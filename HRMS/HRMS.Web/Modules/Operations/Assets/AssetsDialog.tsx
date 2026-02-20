@@ -8,5 +8,16 @@ export class AssetsDialog extends EntityDialog<AssetsRow, any> {
     protected override getRowDefinition() { return AssetsRow; }
     protected override getService() { return AssetsService.baseUrl; }
 
+    protected override getToolbarButtons() {
+        var buttons = super.getToolbarButtons();
+        var saveButton = buttons.find(b => b.cssClass.indexOf('save-button') >= 0);
+        if (saveButton) {
+            saveButton.onClick = () => {
+                this.save(() => this.dialogClose());
+            };
+        }
+        return buttons;
+    }
+
     protected form = new AssetsForm(this.idPrefix);
 }
