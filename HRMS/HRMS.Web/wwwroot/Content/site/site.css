@@ -8,7 +8,7 @@ body {
 .s-sidebar {
     background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
     border-right: none !important;
-    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .s-sidebar .nav-link {
@@ -41,7 +41,7 @@ body {
 
 .s-dashboard-card-sm:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
 .s-dashboard-card-sm .card-body {
@@ -98,8 +98,42 @@ body {
     background-color: #2563eb !important;
 }
 
+/* Back Button */
+.s-back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #e2e8f0 !important;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    margin-left: 10px;
+}
+
+.s-back-button:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: #ffffff !important;
+    transform: translateX(-2px);
+}
+
+.s-back-button i {
+    font-size: 12px;
+}
+
 /* Logo Styling */
 .s-site-logo-img {
     filter: brightness(0) invert(1);
     height: 32px;
+}
+
+.s-site-logo-img:not([src]),
+.s-site-logo-img[src=""] {
+    display: none;
 }

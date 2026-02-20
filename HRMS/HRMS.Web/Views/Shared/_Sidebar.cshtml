@@ -55,6 +55,10 @@
         aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <i class="fa fa-bars"></i>
     </button>
+    <a href="javascript:;" class="s-back-button" id="s-back-btn" title="Go Back">
+        <i class="fa fa-arrow-left"></i>
+        <span>Back</span>
+    </a>
     <div class="s-sidebar-header-branding">
         <img class="s-site-logo-img s-sidebar-header-logo" />
         <span class="s-sidebar-header-title">@SiteNavigationTexts.SiteTitle.ToString(Localizer)</span>
@@ -99,3 +103,14 @@
     }
     </ul>
 </header>
+<script>
+    (function () {
+        var btn = document.getElementById('s-back-btn');
+        if (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                window.history.back();
+            });
+        }
+    })();
+</script>
